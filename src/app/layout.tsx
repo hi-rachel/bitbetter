@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import NavigationGuard from "./components/layout/NavigationGuard";
 
 export const metadata: Metadata = {
   title: "BitBetter",
@@ -11,9 +12,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // 준비 중으로 표시할 경로 목록
+  const pendingRoutes = ["/blog", "/books", "/bookmark", "/1-percent"];
+
   return (
     <html lang="en">
-      <body className={"antialiased"}>{children}</body>
+      <body className={"antialiased"}>
+        <NavigationGuard pendingRoutes={pendingRoutes}>
+          {children}
+        </NavigationGuard>
+      </body>
     </html>
   );
 }

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { Code2 } from "lucide-react";
 import Image from "next/image";
+import BitBetterLogo from "./BitBetterLogo";
 
 const NavBar = () => {
   return (
@@ -11,34 +11,7 @@ const NavBar = () => {
       className="fixed top-0 w-full z-40 backdrop-blur-lg bg-white/80 border-b border-gray-200/50"
     >
       <div className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-        <motion.div whileHover={{ scale: 1.02 }} className="relative group">
-          <div className="flex items-center gap-2">
-            <motion.div
-              className="relative"
-              animate={{
-                rotate: [0, -2, 2, -2, 0],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              whileHover={{ rotate: 0 }}
-            >
-              <div className="p-2 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-xl backdrop-blur-sm">
-                <Code2 className="text-indigo-600" size={24} strokeWidth={2} />
-              </div>
-            </motion.div>
-            <div className="flex items-baseline gap-0.5">
-              <span className="text-2xl font-display font-semibold tracking-tight text-indigo-600">
-                Bit
-              </span>
-              <span className="text-2xl font-display font-semibold tracking-tight text-indigo-600">
-                Better
-              </span>
-            </div>
-          </div>
-        </motion.div>
+        <BitBetterLogo />
 
         <div className="hidden md:flex items-center gap-8">
           {["Blog", "Books", "Bookmark", "1%"].map((item, i) => (
