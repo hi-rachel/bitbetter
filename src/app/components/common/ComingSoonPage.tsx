@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Code2 } from "lucide-react";
 import BitBetterLogo from "./BitBetterLogo";
 
 const ComingSoonPage = () => {
