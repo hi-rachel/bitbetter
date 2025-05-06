@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { fetchGitHubContributions } from "@/lib/github-graphql";
 import GitHubCalendar from "@/components/1-percent/github/GitHubCalendar";
 import GitHubSummaryStats from "@/components/1-percent/github/GithubSummaryStats";
 import ImprovementGoals from "@/components/1-percent/github/ImprovementGoals";
