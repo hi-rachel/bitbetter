@@ -2,13 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import TerminalLoader from "./components/home/loader/TerminalLoader";
-import ThreeBackground from "./components/home/animations/ThreeBackground";
-import FloatingCodeBlock from "./components/home/animations/FloatingCodeBlock";
-import MorphingShape from "./components/home/animations/MorphingShape";
-import InteractiveParticles from "./components/home/animations/InteractiveParticles";
-import HeroSection from "./components/home/sections/HeroSection";
-import MainLayout from "./components/layout/MainLayout";
+import TerminalLoader from "@/components/home/loader/TerminalLoader";
+import ThreeBackground from "@/components/home/animations/ThreeBackground";
+import FloatingCodeBlock from "@/components/home/animations/FloatingCodeBlock";
+import MorphingShape from "@/components/home/animations/MorphingShape";
+import InteractiveParticles from "@/components/home/animations/InteractiveParticles";
+import HeroSection from "@/components/home/sections/HeroSection";
 
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -19,7 +18,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <MainLayout>
+    <>
       <ThreeBackground />
       <InteractiveParticles />
 
@@ -38,7 +37,7 @@ const HomePage = () => {
       <HeroSection />
       <MorphingShape />
       <FloatingCodeBlock />
-    </MainLayout>
+    </>
   );
 };
 
