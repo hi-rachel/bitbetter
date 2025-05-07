@@ -16,7 +16,14 @@ export const fetchUserCreatedYear = async (
     throw new Error(json.message);
   }
 
-  return new Date(json.createdAt).getFullYear();
+  const createdAt = json?.data?.user?.createdAt;
+
+  if (!createdAt) {
+    toast.error("GitHub 생성일이 없습니다.");
+    throw new Error("Missing createdAt");
+  }
+
+  return new Date(createdAt).getFullYear();
 };
 
 export const fetchGitHubContributions = async (

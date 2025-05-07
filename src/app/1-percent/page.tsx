@@ -52,8 +52,6 @@ const OnePercentPage = () => {
 
         // 최초 활동 연도 받아오기
         const earliestYear = await fetchUserCreatedYear(username);
-        if (!earliestYear || isNaN(earliestYear))
-          throw new Error("Invalid created year");
 
         let combined: ContributionDay[] = [];
 
