@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
 import BitBetterLogo from "./BitBetterLogo";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -26,26 +28,32 @@ const NavBar = () => {
         transition={{ duration: 0.5 }}
         className="fixed top-0 w-full z-40 backdrop-blur-lg bg-white/80 border-b border-gray-200/50"
       >
-        <div className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+        <div className="h-[72px] container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
           <Link href={"/"}>
             <BitBetterLogo />
           </Link>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
-            {menuItems.map((item, i) => (
-              <motion.a
-                key={item.name}
-                href={`/${item.path}`}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 + i * 0.1 }}
-                whileHover={{ scale: 1.1 }}
-                className="text-gray-600 hover:text-indigo-600 transition-colors text-lg"
-              >
-                {item.name}
-              </motion.a>
-            ))}
+            {menuItems.map((item, i) => {
+              const isActive = pathname === `/${item.path}`;
+              return (
+                <motion.a
+                  key={item.name}
+                  href={`/${item.path}`}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 + i * 0.05 }}
+                  whileHover={{ y: -5 }}
+                  className={`${
+                    isActive ? "text-indigo-700 font-semibold" : "text-gray-800"
+                  } hover:text-indigo-600 transition-colors text-lg font-medium`}
+                  onClick={toggleMenu}
+                >
+                  {item.name}
+                </motion.a>
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-4">
@@ -63,8 +71,8 @@ const NavBar = () => {
               <Image
                 src="/logo/github.svg"
                 alt="github"
-                width={20}
-                height={20}
+                width={23}
+                height={23}
               />
             </motion.a>
 
