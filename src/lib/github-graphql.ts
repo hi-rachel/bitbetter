@@ -1,26 +1,22 @@
 import { ContributionDay } from "@/types/github";
+import { toast } from "react-hot-toast";
 
 export const fetchUserCreatedYear = async (
   username: string
 ): Promise<number> => {
-  const query = `
-    query {
-      user(login: "${username}") {
-        createdAt
-      }
-    }
-  `;
-
   const res = await fetch("/api/github-created", {
     method: "POST",
-    body: JSON.stringify({ username, query }),
+    body: JSON.stringify({ username }),
   });
 
-  if (!res.ok) throw new Error("Failed to fetch user createdAt");
-
   const json = await res.json();
-  const createdAt = json?.data?.user?.createdAt;
-  return new Date(createdAt).getFullYear();
+
+  if (!res.ok) {
+    toast.error(json.message || "GitHub 사용자 정보를 불러오지 못했습니다.");
+    throw new Error(json.message);
+  }
+
+  return new Date(json.createdAt).getFullYear();
 };
 
 export const fetchGitHubContributions = async (
