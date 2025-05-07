@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchGitHubContributions } from "@/lib/github-graphql";
+import {
+  fetchGitHubContributions,
+  fetchUserCreatedYear,
+} from "@/lib/github-graphql";
 import GitHubCalendar from "@/components/1-percent/github/GitHubCalendar";
 import GitHubSummaryStats from "@/components/1-percent/github/GithubSummaryStats";
 import ImprovementGoals from "@/components/1-percent/github/ImprovementGoals";
@@ -45,22 +48,27 @@ const OnePercentPage = () => {
     const load = async () => {
       setLoading(true);
       try {
+        const currentYear = new Date().getFullYear();
+
+        // 최초 활동 연도 받아오기
+        const earliestYear = await fetchUserCreatedYear(username);
+        if (!earliestYear || isNaN(earliestYear))
+          throw new Error("Invalid created year");
+
         let combined: ContributionDay[] = [];
-        let earliestYear = new Date().getFullYear();
-        for (let year = 2025; year >= 2010; year--) {
+
+        for (let year = currentYear; year >= earliestYear; year--) {
           const data = await fetchGitHubContributions(username, year);
           if (data.some((d) => d.contributionCount > 0)) {
             combined = [...data, ...combined];
-            earliestYear = year;
           }
         }
+
         combined.sort(
           (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
         );
         setAllContributions(combined);
 
-        // 연도 범위 계산
-        const currentYear = new Date().getFullYear();
         const availableYears = [];
         for (let y = currentYear; y >= earliestYear; y--) {
           availableYears.push(y);
