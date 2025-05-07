@@ -60,6 +60,9 @@ const CommitAnalysis = ({
   const [filteredData, setFilteredData] = useState<ContributionDay[]>([]);
 
   useEffect(() => {
+    if (!weeks.length || weeks.every((w) => w.contributionDays.length === 0))
+      return;
+
     const allDays: ContributionDay[] = [];
     weeks.forEach((week) => {
       week.contributionDays.forEach((day) => {
