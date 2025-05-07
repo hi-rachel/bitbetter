@@ -14,7 +14,7 @@ const ClientLayout = ({ children }: { children: ReactNode }) => {
   );
 
   return (
-    <div className="pt-20 min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+    <div className="pt-[72px] min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
       <NavBar />
       <main>{isPendingRoute ? <ComingSoonPage /> : children}</main>
     </div>
