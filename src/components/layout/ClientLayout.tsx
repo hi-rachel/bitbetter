@@ -6,7 +6,7 @@ import NavBar from "../common/NavBar";
 import ComingSoonPage from "../common/ComingSoonPage";
 import { Toaster } from "react-hot-toast";
 
-const pendingRoutes = ["/blog", "/books", "/bookmark"];
+const pendingRoutes = ["/books", "/bookmark"];
 
 const ClientLayout = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
