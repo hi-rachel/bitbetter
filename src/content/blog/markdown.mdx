@@ -1,0 +1,229 @@
+---
+title: "BitBetter Blog Style Guide"
+date: "2025-05-20"
+description: "BitBetter 블로그에서 지원하는 마크다운 스타일 요소 미리보기"
+tags: ["markdown", "styleguide"]
+category: "Docs"
+author: "Raina"
+---
+
+# Heading 1
+
+## Heading 2
+
+### Heading 3
+
+#### Heading 4
+
+기본 본문
+
+---
+
+> 인용구  
+> 왼쪽에 회색 선이 생기며, 기울어진 폰트 스타일입니다.
+
+---
+
+### 굵은 글씨, 기울임, 취소선
+
+- **굵게**
+- _기울임_
+- <del>취소선</del>
+
+---
+
+### 리스트
+
+#### 순서 없는 리스트
+
+- 첫 번째 항목
+- 두 번째 항목
+  - 하위 항목
+    - 더 깊은 항목
+
+#### 순서 있는 리스트
+
+1. 첫 번째 단계
+2. 두 번째 단계
+   1. 하위 단계
+   2. 또 다른 하위 단계
+
+---
+
+### 코드 블록 (Dracula Theme)
+
+```tsx
+const greet = (): string => {
+  return "Hello, World";
+};
+```
+
+---
+
+### 인라인 스타일링
+
+&lt;tmark&gt; 태그: <mark>강조하고 싶은 문장 하이라이팅</mark>
+
+&lt;code&gt; 태그: <code>인라인 코드</code>
+
+---
+
+### 링크
+
+[Next.js 공식 사이트](https://nextjs.org)
+
+---
+
+### 테이블
+
+<table>
+  <thead>
+    <tr>
+      <th>태그</th>
+      <th>설명</th>
+      <th>역할</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>&lt;table&gt;</td>
+      <td>표 전체 컨테이너</td>
+      <td>데이터를 행과 열의 형태로 보여줌</td>
+    </tr>
+    <tr>
+      <td>&lt;thead&gt;</td>
+      <td>표의 머리말</td>
+      <td>열의 제목 행을 정의함</td>
+    </tr>
+    <tr>
+      <td>&lt;tbody&gt;</td>
+      <td>표의 본문</td>
+      <td>실제 데이터 행을 담음</td>
+    </tr>
+    <tr>
+      <td>&lt;tfoot&gt;</td>
+      <td>표의 바닥글 (선택)</td>
+      <td>요약 또는 총합 같은 정보를 제공</td>
+    </tr>
+    <tr>
+      <td>&lt;tr&gt;</td>
+      <td>하나의 행(Row)</td>
+      <td>하나의 수평 줄을 구성</td>
+    </tr>
+    <tr>
+      <td>&lt;th&gt;</td>
+      <td>헤더 셀 (굵은 글씨, 가운데 정렬)</td>
+      <td>열 제목을 나타냄</td>
+    </tr>
+    <tr>
+      <td>&lt;td&gt;</td>
+      <td>일반 데이터 셀</td>
+      <td>표의 내용을 구성하는 셀</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+### 컬러 시스템
+
+<table>
+  <thead>
+    <tr>
+      <th>토큰</th>
+      <th>색상</th>
+      <th>Hex</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>primary</td>
+      <td>
+        <span
+          style={{
+            display: "inline-block",
+            width: "1.25rem",
+            height: "1.25rem",
+            borderRadius: "9999px",
+            backgroundColor: "#4f46e5",
+            border: "1px solid #ccc",
+          }}
+        />
+      </td>
+      <td>#4f46e5</td>
+      <td>메인 강조 색상 (로고, 버튼 등)</td>
+    </tr>
+    <tr>
+      <td>primary-foreground</td>
+      <td>
+        <span
+          style={{
+            display: "inline-block",
+            width: "1.25rem",
+            height: "1.25rem",
+            borderRadius: "9999px",
+            backgroundColor: "#ffffff",
+            border: "1px solid #ccc",
+          }}
+        />
+      </td>
+      <td>#ffffff</td>
+      <td>primary 위에 올라갈 텍스트 색상</td>
+    </tr>
+    <tr>
+      <td>background</td>
+      <td>
+        <span
+          style={{
+            display: "inline-block",
+            width: "1.25rem",
+            height: "1.25rem",
+            borderRadius: "9999px",
+            backgroundColor: "#f8fafc",
+            border: "1px solid #ccc",
+          }}
+        />
+      </td>
+      <td>#f8fafc</td>
+      <td>기본 배경 색상</td>
+    </tr>
+  </tbody>
+</table>
+
+### 폰트 시스템
+
+<table>
+  <thead>
+    <tr>
+      <th>토큰</th>
+      <th>폰트명</th>
+      <th>예시</th>
+      <th>용도</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>font-sans</td>
+      <td>"Pretandard"</td>
+      <td style={{ fontFamily: "Pretandard" }}>기본 폰트</td>
+      <td>본문 및 UI 기본 폰트</td>
+    </tr>
+    <tr>
+      <td>font-mono</td>
+      <td>"IBM Plex Mono"</td>
+      <td style={{ fontFamily: "IBM Plex Mono" }}>IBM Plex Mono 예시</td>
+      <td>코드 블록 및 인라인 코드</td>
+    </tr>
+    <tr>
+      <td>font-display</td>
+      <td>"Space Grotesk"</td>
+      <td style={{ fontFamily: "Space Grotesk" }}>Space Grotesk 예시</td>
+      <td>BitBetter 로고</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+이 문서는 BitBetter 블로그의 마크다운 렌더링 방식 및 스타일을 한눈에 보여주기 위해 작성되었습니다.
