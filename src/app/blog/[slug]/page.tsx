@@ -1,16 +1,20 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import { useMemo } from "react";
 import { allBlogs } from "contentlayer/generated";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import MDXRenderer from "@/components/blog/MDXRenderer";
 
-interface Props {
-  params: { slug: string };
-}
+const BlogDetailPage = () => {
+  const pathname = usePathname();
 
-const BlogDetailPage = async ({ params }: Props) => {
-  // params를 await하여 사용
-  const resolvedParams = await params;
-  const slug = resolvedParams.slug;
+  const slug = useMemo(() => {
+    const segments = pathname?.split("/").filter(Boolean);
+    return segments?.[1]; // 0 = 'blog', 1 = slug
+  }, [pathname]);
+
   const post = allBlogs.find((p) => p.slug === slug);
 
   if (!post) {
@@ -33,10 +37,3 @@ const BlogDetailPage = async ({ params }: Props) => {
 };
 
 export default BlogDetailPage;
-
-// 빌드 시간에 모든 가능한 경로를 생성
-export const generateStaticParams = async (): Promise<{ slug: string }[]> => {
-  return allBlogs.map((post) => ({
-    slug: post.slug,
-  }));
-};
