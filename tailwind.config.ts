@@ -5,18 +5,20 @@ const config: Config = {
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
     "./pages/**/*.{ts,tsx}",
+    "./src/content/**/*.{md,mdx}",
   ],
   theme: {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#4f46e5", // indigo-600
+          DEFAULT: "#4f46e5",
           foreground: "#ffffff",
         },
-        background: "#f8fafc", // slate-50
+        background: "#f8fafc",
       },
     },
   },
   plugins: [],
 };
+
 export default config;
