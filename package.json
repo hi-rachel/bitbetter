@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -16,7 +16,6 @@
     "@next/mdx": "^15.3.2",
     "@radix-ui/react-popover": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.6",
-    "@tailwindcss/typography": "^0.5.16",
     "@types/three": "^0.176.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -36,8 +35,8 @@
     "shiki": "^3.4.0",
     "tailwind-merge": "^3.2.0",
     "three": "^0.176.0",
-    "vfile": "^6.0.3",
-    "vfile-message": "^4.0.2"
+    "vfile": "^6.0.0",
+    "vfile-message": "^4.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
