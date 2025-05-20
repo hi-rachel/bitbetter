@@ -1,8 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap");
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 @import "tailwindcss";
 @import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
@@ -42,18 +41,6 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-}
-
-body {
-  font-family: "Outfit", sans-serif;
-}
-
-.font-display {
-  font-family: "Space Grotesk", sans-serif;
-}
-
-.font-mono {
-  font-family: "IBM Plex Mono", monospace;
 }
 
 :root {
@@ -125,11 +112,158 @@ body {
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+body {
+  font-family: "Pretendard Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
+    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+.font-sans {
+  font-family: "Pretendard Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
+    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+.font-display {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.font-mono {
+  font-family: "IBM Plex Mono", monospace;
+}
+
+/* 하이라이트된 줄 */
+.highlighted {
+  background-color: rgba(255, 255, 255, 0.05); /* 드라큘라 배경과 어울리는 색 */
+}
+
+/* 강조된 단어 */
+.word--highlighted {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0 0.2em;
+  border-radius: 0.2em;
+}
+
+/* 코드 블록 전체 배경 및 padding */
+pre {
+  border-radius: 0.5rem;
+  overflow: auto;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+pre code {
+  display: grid;
+  counter-reset: line;
+}
+
+.mdx-content pre:not([class*="language-"]) {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.mdx-content h1 {
+  @apply text-4xl font-extrabold mt-14 mb-6;
+}
+.mdx-content h2 {
+  @apply text-3xl font-bold mt-12 mb-5;
+}
+.mdx-content h3 {
+  @apply text-2xl font-semibold mt-10 mb-4;
+}
+
+.mdx-content h4 {
+  @apply text-xl font-medium mt-8 mb-3;
+}
+
+.mdx-content p {
+  @apply my-4 leading-relaxed;
+}
+
+.mdx-content blockquote {
+  @apply border-l-4 pl-4 italic my-6 text-muted-foreground;
+}
+
+.mdx-content ul,
+.mdx-content ol {
+  @apply pl-6 mt-4 mb-6 space-y-3;
+}
+
+.mdx-content ul ul,
+.mdx-content ol ol {
+  @apply pl-4 mt-1 mb-2 space-y-1;
+}
+
+.mdx-content li {
+  @apply leading-7;
+}
+
+.mdx-content table {
+  @apply w-full border-collapse text-sm my-6;
+}
+
+.mdx-content th,
+.mdx-content td {
+  @apply border border-gray-300 dark:border-gray-700 px-4 py-2;
+}
+
+.mdx-content a {
+  @apply underline underline-offset-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300;
+}
+
+.mdx-content mark {
+  font-family: "IBM Plex Mono", monospace;
+  background-color: #e6f4ea;
+  color: #1b5e20;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  font-size: 0.9em;
+}
+
+.mdx-content code:not(pre code) {
+  background-color: rgba(135, 131, 120, 0.15); /* Notion-like bg */
+  color: #eb5757; /* Notion uses near-default text color but you can customize */
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9em;
+  font-weight: 500;
+  white-space: break-spaces;
+}
+
+/* 다크 모드 대응 (선택) */
+/* .dark .mdx-content code:not(pre code) {
+  background-color: #1b5e20;
+  color: #e6f4ea;
+} */
+
+.mdx-content del {
+  text-decoration: line-through;
+  color: theme("colors.gray.500");
+}
+
+.mdx-content table {
+  @apply w-full border-collapse text-sm my-6;
+}
+
+.mdx-content th,
+.mdx-content td {
+  @apply border border-gray-300 dark:border-gray-700 px-4 py-2 text-left;
+}
+
+.mdx-content thead {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+.mdx-content tbody tr:nth-child(even) {
+  @apply bg-gray-50 dark:bg-gray-900;
+}
+
+.mdx-content hr {
+  @apply my-8 border-t border-gray-200 dark:border-gray-700;
 }
