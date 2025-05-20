@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import NavBar from "../common/NavBar";
+import HeaderNavigation from "../common/HeaderNavigation";
 import ComingSoonPage from "../common/ComingSoonPage";
 import { Toaster } from "react-hot-toast";
 
@@ -17,7 +17,7 @@ const ClientLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="pt-[72px] min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
       <Toaster />
-      <NavBar />
+      <HeaderNavigation />
       <main>{isPendingRoute ? <ComingSoonPage /> : children}</main>
     </div>
   );
