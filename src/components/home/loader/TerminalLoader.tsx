@@ -29,7 +29,7 @@ const TerminalLoader = () => {
   }, []);
 
   return (
-    <div className="font-mono bg-gray-900 text-green-400 p-6 rounded-xl shadow-2xl w-full max-w-md">
+    <div className="font-medium bg-gray-900 text-green-400 p-6 rounded-xl shadow-2xl w-full max-w-md">
       <div className="flex items-center gap-2 mb-4">
         <div className="w-3 h-3 rounded-full bg-red-500" />
         <div className="w-3 h-3 rounded-full bg-yellow-500" />
@@ -38,19 +38,19 @@ const TerminalLoader = () => {
       </div>
       <div className="space-y-2">
         <p>
-          <span className="text-purple-400">$</span> npm run dev:portfolio
+          <span className="text-purple-400 pr-1">$</span> npm run dev:portfolio
         </p>
         <p>
-          <span className="text-purple-400">$</span> Loading components... [
-          {progress}%]
+          <span className="text-purple-400 pr-1">$</span> Loading components...
+          [{progress}%]
         </p>
         <p className="text-blue-400">
-          <span className="text-purple-400">$</span> Initializing 3D
+          <span className="text-purple-400 pr-1">$</span> Initializing 3D
           environment... 🚀
         </p>
         <p className="text-cyan-400">
-          <span className="text-purple-400">$</span> Building frontend magic...
-          ✨
+          <span className="text-purple-400 pr-1">$</span> Building frontend
+          magic... ✨
         </p>
         <div className="mt-2 bg-gray-800 rounded p-2">
           <div className="w-full bg-gray-700 rounded-full h-2">
