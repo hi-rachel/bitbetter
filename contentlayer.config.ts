@@ -1,5 +1,6 @@
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
 import rehypePrettyCode from "rehype-pretty-code";
+import rehypeSlug from "rehype-slug";
 
 const Blog = defineDocumentType(() => ({
   name: "Blog",
@@ -33,6 +34,7 @@ export default makeSource({
           theme: "dracula",
         },
       ],
+      rehypeSlug,
     ],
   },
 });
