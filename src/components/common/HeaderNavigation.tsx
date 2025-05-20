@@ -5,7 +5,7 @@ import BitBetterLogo from "./BitBetterLogo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NavBar = () => {
+const HeaderNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
@@ -46,8 +46,8 @@ const NavBar = () => {
                   transition={{ delay: 0.05 + i * 0.05 }}
                   whileHover={{ y: -5 }}
                   className={`${
-                    isActive ? "text-indigo-700 font-semibold" : "text-gray-800"
-                  } hover:text-indigo-600 transition-colors text-lg font-medium`}
+                    isActive ? "text-indigo-700" : "text-gray-800"
+                  } hover:text-indigo-600 transition-colors text-lg font-semibold`}
                   onClick={toggleMenu}
                 >
                   {item.name}
@@ -153,4 +153,4 @@ const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default HeaderNavigation;

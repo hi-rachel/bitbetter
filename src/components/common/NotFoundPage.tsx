@@ -29,7 +29,7 @@ const NotFoundPage = () => {
       <div className="relative z-10 max-w-md w-full bg-white/70 backdrop-blur-md p-8 rounded-2xl shadow-sm border border-indigo-100">
         {/* 로고 */}
         <div className="mb-8 flex justify-center">
-          <BitBetterLogo size="md" animated={false} />
+          <BitBetterLogo size="md" />
         </div>
 
         {/* 404 텍스트 */}

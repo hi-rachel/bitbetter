@@ -7,16 +7,14 @@ export const metadata: Metadata = {
   description: "1% Everyday Better",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <body className="antialiased">
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;
