@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import MDXRenderer from "@/components/blog/MDXRenderer";
 
 interface Props {
-  params: Promise<{ slug: string }> | { slug: string };
+  params: { slug: string };
 }
 
 const BlogDetailPage = async ({ params }: Props) => {
