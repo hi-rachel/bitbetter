@@ -49,7 +49,7 @@ const ComingSoonPage = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.8, type: "spring" }}
       >
-        <BitBetterLogo size="lg" animated={false} />
+        <BitBetterLogo size="lg" />
       </motion.div>
 
       {/* 메인 컨텐츠 */}
@@ -59,7 +59,7 @@ const ComingSoonPage = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.8 }}
       >
-        <h1 className="text-4xl md:text-5xl font-display font-bold mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
+        <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
           서비스 준비 중입니다
         </h1>
         <p className="text-lg text-gray-600 mb-4">
