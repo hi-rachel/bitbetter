@@ -6,7 +6,7 @@ import HeaderNavigation from "../common/HeaderNavigation";
 import ComingSoonPage from "../common/ComingSoonPage";
 import { Toaster } from "react-hot-toast";
 
-const pendingRoutes = ["/books", "/bookmark"];
+const pendingRoutes = ["/bookmark"];
 
 const ClientLayout = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
