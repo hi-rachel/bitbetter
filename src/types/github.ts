@@ -1,9 +1,9 @@
-export interface ContributionDay {
+export type ContributionDay = {
   date: string;
   contributionCount: number;
   color?: string;
-}
+};
 
-export interface Week {
+export type Week = {
   contributionDays: ContributionDay[];
-}
+};
