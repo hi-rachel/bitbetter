@@ -12,7 +12,8 @@ const BlogDetailPage = () => {
 
   const slug = useMemo(() => {
     const segments = pathname?.split("/").filter(Boolean);
-    return segments?.[1]; // 0 = 'blog', 1 = slug
+
+    return segments?.slice(1).join("/");
   }, [pathname]);
 
   const post = allBlogs.find((p) => p.slug === slug);
