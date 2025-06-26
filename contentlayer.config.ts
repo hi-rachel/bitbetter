@@ -16,7 +16,12 @@ const Blog = defineDocumentType(() => ({
   computedFields: {
     slug: {
       type: "string",
-      resolve: (doc) => doc._raw.sourceFileName.replace(/\.mdx$/, ""),
+      resolve: (doc) => {
+        // blog/ 폴더를 제외하고 나머지 경로를 slug로 사용
+        const relativePath = doc._raw.sourceFilePath.replace(/^.*?blog\//, "");
+        // 파일 확장자 제거하고 소문자로 변환
+        return relativePath.replace(/\.mdx$/, "").toLowerCase();
+      },
     },
   },
 }));
