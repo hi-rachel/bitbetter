@@ -285,6 +285,7 @@ pre code {
   @apply bg-gray-50 dark:bg-gray-900;
 }
 
-.mdx-content hr {
+.mdx-content hr,
+hr {
   @apply my-8 border-t border-gray-200 dark:border-gray-700;
 }
