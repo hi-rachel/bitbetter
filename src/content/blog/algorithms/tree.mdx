@@ -1,0 +1,191 @@
+---
+title: "트리 순회"
+date: "2025-06-26"
+description: "BitBetter 블로그에서 지원하는 마크다운 스타일 요소 미리보기"
+tags: ["markdown", "styleguide"]
+category: "Docs"
+---
+
+# 전위 순회 (Pre-order Traversal)
+
+트리의 **전위 순회**는 루트 노드를 먼저 방문하고,
+왼쪽 서브트리 → 오른쪽 서브트리 순서로 방문하는 순회 방식입니다.
+
+**순서: 루트 → 왼쪽 → 오른쪽**
+
+```
+        A
+       / \
+      B   C
+     / \   \
+    D   E   F
+```
+
+전위 순회 결과: A → B → D → E → C → F
+
+### 전위 순회 구현 (재귀)
+
+```python
+def preorder(node):
+    if node is None:
+        return
+    print(node.val)       # 1. 루트
+    preorder(node.left)   # 2. 왼쪽
+    preorder(node.right)  # 3. 오른쪽
+```
+
+### 전위 순회 구현 (반복/스택)
+
+```python
+def preorder_iterative(root):
+    if not root:
+        return []
+
+    stack = [root]
+    result = []
+
+    while stack:
+        node = stack.pop()
+        result.append(node.val)
+
+        # 오른쪽을 먼저 push → 왼쪽이 먼저 pop됨 (전위 순회 순서: 루트 -> 왼쪽 -> 오른쪽 유지)
+        if node.right:
+            stack.append(node.right)
+        if node.left:
+            stack.append(node.left)
+
+    return result
+```
+
+---
+
+# 중위 순회 (In-order Traversal)
+
+**중위 순회**는 이진 트리 순회 방법 중 하나로, 특히 이진 탐색 트리에서 중요한 역할을 합니다.
+
+**순서: 왼쪽 서브트리 → 루트 → 오른쪽 서브트리**
+
+```
+        4
+       / \
+      2   6
+     / \ / \
+    1  3 5  7
+```
+
+중위 순회 결과: 1 → 2 → 3 → 4 → 5 → 6 → 7
+
+**이진 탐색 트리(Binary Search Tree)일 경우, 중위 순회를 하면 항상 오름차순 정렬된 값**이 됩니다.
+
+이진 탐색 트리는 왼쪽 서브트리는 루트보다 작은 값들, 오른쪽
+서브트리는 루트보다 큰 값들, 그래서 중위 순회를 하면 항상 오름차순으로 정렬된
+값이 나옵니다.
+
+### 중위 순회 구현 (반복/스택)
+
+```python
+def inorder_iterative(root):
+    result = []
+    stack = []
+    node = root
+
+    while node or stack:
+        while node:
+            stack.append(node)
+            node = node.left  # 왼쪽 먼저 탐색
+
+        node = stack.pop()
+        result.append(node.val)
+        node = node.right  # 오른쪽 탐색
+
+    return result
+```
+
+---
+
+# 후위 순회 (Post-order Traversal)
+
+**순서: 왼쪽 → 오른쪽 → 루트**
+
+```
+        A
+       / \
+      B   C
+     / \   \
+    D   E   F
+```
+
+후위 순회 결과: D → E → B → F → C → A
+
+가장 마지막에 루트 노드를 방문합니다.
+하위 트리를 다 처리한 후에 부모 노드를 처리하는 것이 특징입니다.
+
+### 후위 순회 구현 (재귀)
+
+```py
+def postorder(node):
+    if not node:
+        return
+
+    postorder(node.left)     # 1. 왼쪽
+    postorder(node.right)    # 2. 오른쪽
+    print(node.val)          # 3. 루트
+```
+
+### 후위 순회 구현 (반복/스택)
+
+```py
+def postorder_iterative(root):
+    if not root:
+        return []
+
+    stack = [root]
+    result = []
+
+    while stack:
+        node = stack.pop()
+        result.append(node.val)
+
+        # 왼쪽 먼저 push (그래야 나중에 pop되므로 오른쪽이 먼저 처리됨)
+        if node.left:
+            stack.append(node.left)
+        if node.right:
+            stack.append(node.right)
+
+    return result[::-1]  # 결과를 뒤집어야 후위 순서가 됨
+```
+
+### 전·중·후 순회 비교표
+
+<table>
+  <thead>
+    <tr>
+      <th>순회 이름</th>
+      <th>순서</th>
+      <th>특징</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>전위</td>
+      <td>
+        <strong>루트 → 왼쪽 → 오른쪽</strong>
+      </td>
+      <td>복사/출력에 유용</td>
+    </tr>
+    <tr>
+      <td>중위</td>
+      <td>
+        <strong>왼쪽 → 루트 → 오른쪽</strong>
+      </td>
+      <td>BST일 경우 정렬</td>
+    </tr>
+    <tr>
+      <td>후위</td>
+      <td>
+        <strong>왼쪽 → 오른쪽 → 루트</strong>
+      </td>
+      <td>삭제, 계산 등 후처리에 유용</td>
+    </tr>
+  </tbody>
+</table>
