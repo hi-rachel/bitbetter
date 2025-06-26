@@ -187,20 +187,6 @@ pre code {
   color: #111827;
 }
 
-.mdx-content h1 {
-  @apply text-4xl font-extrabold mt-14 mb-6;
-}
-.mdx-content h2 {
-  @apply text-3xl font-bold mt-12 mb-5;
-}
-.mdx-content h3 {
-  @apply text-2xl font-semibold mt-10 mb-4;
-}
-
-.mdx-content h4 {
-  @apply text-xl font-medium mt-8 mb-3;
-}
-
 .mdx-content p {
   @apply my-4 leading-relaxed;
 }

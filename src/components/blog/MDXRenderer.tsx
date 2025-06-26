@@ -17,7 +17,7 @@ const MDXRenderer = ({ code }: MDXRendererProps): React.ReactElement => {
   const Component = useMDXComponent(code);
 
   useEffect(() => {
-    const headings = document.querySelectorAll("h1, h2, h3");
+    const headings = document.querySelectorAll("h1, h2, h3, h4");
     const tocItems: TOCItem[] = [];
 
     headings.forEach((heading) => {
@@ -30,19 +30,24 @@ const MDXRenderer = ({ code }: MDXRendererProps): React.ReactElement => {
 
   const mdxComponents = {
     h1: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-      <h1 className="text-4xl font-bold mt-14 mb-6" {...props}>
+      <h1 className="text-4xl font-extrabold mt-12 mb-6" {...props}>
         {children}
       </h1>
     ),
     h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-      <h2 className="text-3xl font-semibold mt-12 mb-5" {...props}>
+      <h2 className="text-3xl font-bold mt-12 mb-5" {...props}>
         {children}
       </h2>
     ),
     h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-      <h3 className="text-2xl font-medium mt-10 mb-4" {...props}>
+      <h3 className="text-2xl font-semibold mt-10 mb-4" {...props}>
         {children}
       </h3>
+    ),
+    h4: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+      <h4 className="text-xl font-medium mt-8 mb-3" {...props}>
+        {children}
+      </h4>
     ),
     p: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
       <p
