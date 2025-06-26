@@ -2,12 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-
-interface Heading {
-  id: string;
-  text: string;
-  level: number;
-}
+import { Heading } from "@/types/blog/element";
 
 const TOCContainer = () => {
   const [headings, setHeadings] = useState<Heading[]>([]);
