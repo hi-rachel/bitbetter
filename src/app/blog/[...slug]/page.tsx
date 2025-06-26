@@ -12,7 +12,6 @@ const BlogDetailPage = () => {
 
   const slug = useMemo(() => {
     const segments = pathname?.split("/").filter(Boolean);
-
     return segments?.slice(1).join("/");
   }, [pathname]);
 
@@ -23,18 +22,20 @@ const BlogDetailPage = () => {
   }
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-5xl font-extrabold mb-4">{post.title}</h1>
-        <p className="text-sm text-gray-500 mb-8">
-          {format(new Date(post.date), "yyyy-MM-dd")}
-        </p>
-        <hr />
-        <article>
+    <div className="w-full">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-extrabold mb-3 sm:mb-4 leading-tight break-words">
+        {post.title}
+      </h1>
+      <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-8">
+        {format(new Date(post.date), "yyyy-MM-dd")}
+      </p>
+      <hr className="mb-4 sm:mb-8" />
+      <article className="w-full overflow-x-auto">
+        <div className="w-full">
           <MDXRenderer code={post.body.code} />
-        </article>
-      </div>
-    </main>
+        </div>
+      </article>
+    </div>
   );
 };
 

@@ -172,9 +172,15 @@ pre {
   border-radius: 0.5rem;
   overflow: auto;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.875rem; /* text-sm */
+  font-size: 0.75rem; /* text-xs */
   line-height: 1.5;
   font-weight: 500;
+}
+
+@media (min-width: 640px) {
+  pre {
+    font-size: 0.875rem; /* text-sm */
+  }
 }
 
 pre code {
@@ -188,34 +194,34 @@ pre code {
 }
 
 .mdx-content p {
-  @apply my-4 leading-relaxed;
+  @apply my-3 sm:my-4 leading-relaxed;
 }
 
 .mdx-content blockquote {
-  @apply border-l-4 pl-4 italic my-6 text-muted-foreground;
+  @apply border-l-4 pl-3 sm:pl-4 italic my-4 sm:my-5 md:my-6 text-muted-foreground;
 }
 
 .mdx-content ul,
 .mdx-content ol {
-  @apply pl-6 mt-4 mb-6 space-y-3;
+  @apply pl-4 sm:pl-6 mt-3 sm:mt-4 md:mt-4 mb-4 sm:mb-5 md:mb-6 space-y-2 sm:space-y-3;
 }
 
 .mdx-content ul ul,
 .mdx-content ol ol {
-  @apply pl-4 mt-1 mb-2 space-y-1;
+  @apply pl-3 sm:pl-4 mt-1 mb-2 space-y-1;
 }
 
 .mdx-content li {
-  @apply leading-7;
+  @apply leading-6 sm:leading-7;
 }
 
 .mdx-content table {
-  @apply w-full border-collapse text-sm my-6;
+  @apply w-full border-collapse text-xs sm:text-sm my-4 sm:my-5 md:my-6;
 }
 
 .mdx-content th,
 .mdx-content td {
-  @apply border border-gray-300 dark:border-gray-700 px-4 py-2;
+  @apply border border-gray-300 dark:border-gray-700 px-2 sm:px-3 md:px-4 py-2;
 }
 
 .mdx-content a {
@@ -226,21 +232,35 @@ pre code {
   font-family: "IBM Plex Mono", monospace;
   background-color: #e6f4ea;
   color: #1b5e20;
-  padding: 0.15rem 0.4rem;
+  padding: 0.1rem 0.3rem;
   border-radius: 0.25rem;
   font-weight: 500;
-  font-size: 0.9em;
+  font-size: 0.8em;
+}
+
+@media (min-width: 640px) {
+  .mdx-content mark {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.9em;
+  }
 }
 
 .mdx-content code:not(pre code) {
   background-color: rgba(135, 131, 120, 0.15); /* Notion-like bg */
   color: #eb5757; /* Notion uses near-default text color but you can customize */
-  padding: 0.2em 0.4em;
+  padding: 0.15em 0.3em;
   border-radius: 4px;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.9em;
+  font-size: 0.8em;
   font-weight: 500;
   white-space: break-spaces;
+}
+
+@media (min-width: 640px) {
+  .mdx-content code:not(pre code) {
+    padding: 0.2em 0.4em;
+    font-size: 0.9em;
+  }
 }
 
 /* 다크 모드 대응 (선택) */
@@ -255,12 +275,12 @@ pre code {
 }
 
 .mdx-content table {
-  @apply w-full border-collapse text-sm my-6;
+  @apply w-full border-collapse text-xs sm:text-sm my-4 sm:my-5 md:my-6;
 }
 
 .mdx-content th,
 .mdx-content td {
-  @apply border border-gray-300 dark:border-gray-700 px-4 py-2 text-left;
+  @apply border border-gray-300 dark:border-gray-700 px-2 sm:px-3 md:px-4 py-2 text-left;
 }
 
 .mdx-content thead {
@@ -273,5 +293,5 @@ pre code {
 
 .mdx-content hr,
 hr {
-  @apply my-8 border-t border-gray-200 dark:border-gray-700;
+  @apply my-6 sm:my-7 md:my-8 border-t border-gray-200 dark:border-gray-700;
 }
