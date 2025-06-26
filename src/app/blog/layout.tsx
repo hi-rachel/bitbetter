@@ -26,8 +26,10 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
 
       {/* 오른쪽 목차 (상세 페이지에서만 표시) */}
       {isDetailPage && (
-        <aside className="hidden xl:block w-64 border-l border-gray-200 px-6 py-8">
-          <TOCContainer />
+        <aside className="hidden xl:block w-64 border-l border-gray-200 px-6 py-8 relative">
+          <div className="h-screen overflow-hidden">
+            <TOCContainer />
+          </div>
         </aside>
       )}
     </div>
