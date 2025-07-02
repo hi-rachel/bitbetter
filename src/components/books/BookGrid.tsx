@@ -1,8 +1,10 @@
 "use client";
 
-import { Book } from "@/types/book";
-import { BookCard } from "./BookCard";
 import { motion } from "framer-motion";
+
+import { Book } from "@/types/book";
+
+import { BookCard } from "./BookCard";
 
 type BookGridProps = {
   books: Book[];

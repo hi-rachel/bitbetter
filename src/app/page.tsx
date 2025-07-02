@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import TerminalLoader from "@/components/home/loader/TerminalLoader";
-import ThreeBackground from "@/components/home/animations/ThreeBackground";
+
+import { AnimatePresence,motion } from "framer-motion";
+
 import FloatingCodeBlock from "@/components/home/animations/FloatingCodeBlock";
-import MorphingShape from "@/components/home/animations/MorphingShape";
 import InteractiveParticles from "@/components/home/animations/InteractiveParticles";
+import MorphingShape from "@/components/home/animations/MorphingShape";
+import ThreeBackground from "@/components/home/animations/ThreeBackground";
+import TerminalLoader from "@/components/home/loader/TerminalLoader";
 import HeroSection from "@/components/home/sections/HeroSection";
 
 const HomePage = () => {

@@ -1,17 +1,19 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import Image from "next/image";
+
+import { AnimatePresence,motion } from "framer-motion";
 import { BookOpen, MessageSquare } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Book, BookHighlight } from "@/types/book";
 
 type BookDetailProps = {

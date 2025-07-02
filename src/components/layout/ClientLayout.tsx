@@ -1,10 +1,12 @@
 "use client";
 
 import { ReactNode } from "react";
-import { usePathname } from "next/navigation";
-import HeaderNavigation from "../common/HeaderNavigation";
-import ComingSoonPage from "../common/ComingSoonPage";
 import { Toaster } from "react-hot-toast";
+import { usePathname } from "next/navigation";
+
+import ComingSoonPage from "../common/ComingSoonPage";
+import HeaderNavigation from "../common/HeaderNavigation";
+
 
 const pendingRoutes = ["/bookmark"];
 

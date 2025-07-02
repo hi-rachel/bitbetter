@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { CalendarIcon, TrendingUpIcon } from "lucide-react";
+import { useEffect, useMemo,useState } from "react";
 import dynamic from "next/dynamic";
+
+import { CalendarIcon, TrendingUpIcon } from "lucide-react";
 
 // 클라이언트 사이드에서만 렌더링되도록 동적 임포트
 const CompoundGrowthTable = dynamic(() => import("./CompoundGrowthTable"), {

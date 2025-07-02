@@ -1,18 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
+import { BookOpen,Github, TrendingUp, User } from "lucide-react";
+
+import CommitAnalysis from "@/components/1-percent/github/CommitAnalysis";
+import GitHubCalendar from "@/components/1-percent/github/GitHubCalendar";
+import GitHubSummaryStats from "@/components/1-percent/github/GithubSummaryStats";
+import ImprovementGoals from "@/components/1-percent/github/ImprovementGoals";
+import StatCard from "@/components/1-percent/github/StatCard";
+import { DEFAULT_START_DATE, DEFAULT_USERNAME } from "@/constants/github";
 import {
   fetchGitHubContributions,
   fetchUserCreatedYear,
 } from "@/lib/github-graphql";
-import GitHubCalendar from "@/components/1-percent/github/GitHubCalendar";
-import GitHubSummaryStats from "@/components/1-percent/github/GithubSummaryStats";
-import ImprovementGoals from "@/components/1-percent/github/ImprovementGoals";
-import { Github, TrendingUp, User, BookOpen } from "lucide-react";
-import CommitAnalysis from "@/components/1-percent/github/CommitAnalysis";
 import { ContributionDay, Week } from "@/types/github";
-import { DEFAULT_START_DATE, DEFAULT_USERNAME } from "@/constants/github";
-import StatCard from "@/components/1-percent/github/StatCard";
 
 type TabType = "dashboard" | "analysis" | "goals";
 

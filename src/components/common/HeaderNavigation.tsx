@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import Image from "next/image";
-import BitBetterLogo from "./BitBetterLogo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import { motion } from "framer-motion";
+
+import BitBetterLogo from "./BitBetterLogo";
 
 const HeaderNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);

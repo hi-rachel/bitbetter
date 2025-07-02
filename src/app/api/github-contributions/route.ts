@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { Week } from "@/types/github";
 
 export const GET = async (req: NextRequest) => {

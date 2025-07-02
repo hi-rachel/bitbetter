@@ -1,10 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
-import { Book } from "@/types/book";
-import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
+
 import { motion } from "framer-motion";
+
+import { Badge } from "@/components/ui/badge";
+import { Book } from "@/types/book";
 
 type BookCardProps = {
   book: Book;

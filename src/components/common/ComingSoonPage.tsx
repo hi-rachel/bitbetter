@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+
 import BitBetterLogo from "./BitBetterLogo";
 
 const ComingSoonPage = () => {

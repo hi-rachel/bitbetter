@@ -1,20 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
+import { Calendar, Hash, Star,Trophy } from "lucide-react";
 import {
-  BarChart,
   Bar,
-  LineChart,
+  BarChart,
+  CartesianGrid,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
-import { Calendar, Trophy, Hash, Star } from "lucide-react";
-import StatCard from "./StatCard";
+
 import { ContributionDay, Week } from "@/types/github";
+
+import StatCard from "./StatCard";
+
 
 interface DayData {
   name: string;

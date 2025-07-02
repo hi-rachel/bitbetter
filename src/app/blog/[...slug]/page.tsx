@@ -1,10 +1,12 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { useMemo } from "react";
-import { allBlogs } from "contentlayer/generated";
+import { usePathname } from "next/navigation";
 import { notFound } from "next/navigation";
+
+import { allBlogs } from "contentlayer/generated";
 import { format } from "date-fns";
+
 import MDXRenderer from "@/components/blog/MDXRenderer";
 
 const BlogDetailPage = () => {

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import "./globals.css";
+
 import ClientLayout from "@/components/layout/ClientLayout";
+
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "BitBetter",

@@ -1,5 +1,6 @@
-import { Code2 } from "lucide-react";
 import { FC } from "react";
+
+import { Code2 } from "lucide-react";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";

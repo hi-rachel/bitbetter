@@ -1,6 +1,7 @@
-import { BookOpen, Brain, Heart, Leaf, Mountain } from "lucide-react";
-import TagBadge from "../../common/TagBadge";
 import { motion } from "framer-motion";
+import { BookOpen, Brain, Heart, Leaf, Mountain } from "lucide-react";
+
+import TagBadge from "../../common/TagBadge";
 
 const HeroSection = () => {
   const tags = [

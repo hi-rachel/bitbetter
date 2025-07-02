@@ -1,5 +1,6 @@
-import { ContributionDay } from "@/types/github";
 import { toast } from "react-hot-toast";
+
+import { ContributionDay } from "@/types/github";
 
 export const fetchUserCreatedYear = async (
   username: string

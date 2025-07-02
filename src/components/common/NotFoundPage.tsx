@@ -1,8 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
+
+import { motion } from "framer-motion";
 import { ArrowLeft, Ghost } from "lucide-react";
+
 import BitBetterLogo from "./BitBetterLogo";
 
 const NotFoundPage = () => {

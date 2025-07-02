@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect,useState } from "react";
+
+import { Info } from "lucide-react";
+
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
-import { Info } from "lucide-react";
 
 interface GrowthData {
   year: number;

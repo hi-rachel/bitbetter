@@ -1,12 +1,13 @@
 import { useState } from "react";
+
 import {
-  Target,
-  Check,
-  Plus,
-  Trash2,
   BookOpen,
+  Check,
   Code,
   Github,
+  Plus,
+  Target,
+  Trash2,
 } from "lucide-react";
 
 interface Goal {

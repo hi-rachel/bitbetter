@@ -1,9 +1,10 @@
 "use client";
 
 import { ReactNode } from "react";
+import { usePathname } from "next/navigation";
+
 import BlogSidebar from "@/components/blog/BlogSidebar";
 import TOCContainer from "@/components/blog/TOCContainer";
-import { usePathname } from "next/navigation";
 
 interface BlogLayoutProps {
   children: ReactNode;

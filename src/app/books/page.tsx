@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { categories, books, getBooksByCategory } from "@/data/books";
-import { BookGrid } from "@/components/books/BookGrid";
-import { BookDetail } from "@/components/books/BookDetail";
+
 import { motion } from "framer-motion";
+
+import { BookDetail } from "@/components/books/BookDetail";
+import { BookGrid } from "@/components/books/BookGrid";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { books, categories, getBooksByCategory } from "@/data/books";
 
 const BooksPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>(

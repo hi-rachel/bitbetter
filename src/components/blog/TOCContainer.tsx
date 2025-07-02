@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+
 import { Heading } from "@/types/blog/element";
 
 const TOCContainer = () => {

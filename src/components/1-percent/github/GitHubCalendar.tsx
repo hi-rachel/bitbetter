@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { ContributionDay, Week } from "@/types/github";
 
 interface GitHubCalendarProps {
