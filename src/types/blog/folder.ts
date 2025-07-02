@@ -7,3 +7,9 @@ export interface FolderStructure {
     displayName: string;
   };
 }
+
+export interface BlogTreeNode {
+  name: string;
+  children?: BlogTreeNode[];
+  post?: BlogPost;
+}
