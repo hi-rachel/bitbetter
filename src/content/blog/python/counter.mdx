@@ -1,0 +1,172 @@
+---
+title: "Counter 사용법 (collections 모듈)"
+date: "2025-07-02"
+description: "Python collections.Counter로 손쉽게 데이터 개수 세기"
+tags: ["Counter", "Python", "collections"]
+category: "Docs"
+---
+
+# Counter (collections 모듈)
+
+Python의 `collections` 모듈에 포함된 **Counter**는 데이터의 등장 횟수를 빠르고 쉽게 셀 수 있는 **해시 기반 카운터 자료구조**입니다.
+
+---
+
+## Counter란?
+
+- **리스트, 문자열, 튜플 등 반복 가능한 객체의 각 원소가 몇 번 등장하는지 세어주는 dict 서브클래스**입니다.
+- 데이터 분석, 빈도수 집계, 최빈값 찾기 등에 매우 유용합니다.
+
+---
+
+## 기본 사용법
+
+```python
+from collections import Counter
+
+# 리스트에서 개수 세기
+nums = [1, 2, 2, 3, 3, 3]
+c = Counter(nums)
+print(c)  # Counter({3: 3, 2: 2, 1: 1})
+
+# 문자열에서 개수 세기
+s = "hello world"
+c = Counter(s)
+print(c)  # Counter({'l': 3, 'o': 2, 'h': 1, 'e': 1, ' ': 1, 'w': 1, 'r': 1, 'd': 1})
+```
+
+---
+
+## 주요 메서드/속성 정리
+
+<table>
+  <thead>
+    <tr>
+      <th>메서드/속성</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>elements()</code>
+      </td>
+      <td>카운트된 원소를 반복자(iterator)로 반환 (0 이하인 값은 제외)</td>
+    </tr>
+    <tr>
+      <td>
+        <code>most_common([n])</code>
+      </td>
+      <td>가장 많이 등장한 n개의 (원소, 개수) 튜플 리스트 반환</td>
+    </tr>
+    <tr>
+      <td>
+        <code>subtract(iterable)</code>
+      </td>
+      <td>다른 iterable의 카운트를 빼기</td>
+    </tr>
+    <tr>
+      <td>
+        <code>update(iterable)</code>
+      </td>
+      <td>다른 iterable의 카운트를 더하기</td>
+    </tr>
+    <tr>
+      <td>
+        <code>c[key]</code>
+      </td>
+      <td>key의 개수 반환 (없으면 0)</td>
+    </tr>
+    <tr>
+      <td>
+        <code>+ - & |</code>
+      </td>
+      <td>Counter 간 합집합, 교집합, 차집합, 합산 연산 지원</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 주요 메서드/속성 예제
+
+```python
+from collections import Counter
+
+c = Counter("aabbccc")
+
+# elements()
+print(list(c.elements()))  # ['a', 'a', 'b', 'b', 'c', 'c', 'c']
+
+# most_common([n])
+print(c.most_common(2))  # [('c', 3), ('a', 2)]
+
+# subtract(iterable)
+c2 = Counter("abc")
+c.subtract(c2)
+print(c)  # Counter({'c': 2, 'a': 1, 'b': 1})
+
+# update(iterable)
+c.update("bcc")
+print(c)  # Counter({'c': 4, 'b': 2, 'a': 1})
+
+# c[key]
+print(c['b'])  # 2
+print(c['z'])  # 0 (없는 키는 0 반환)
+
+# + - & | 연산
+c3 = Counter("aabbcc")
+c4 = Counter("abccc")
+print(c3 + c4)  # Counter({'c': 5, 'a': 3, 'b': 3})
+print(c3 - c4)  # Counter({'a': 1, 'b': 1})
+print(c3 & c4)  # Counter({'a': 1, 'b': 1, 'c': 2})  # 교집합(최소값)
+print(c3 | c4)  # Counter({'c': 3, 'a': 2, 'b': 2})  # 합집합(최대값)
+```
+
+---
+
+## 실전 예제
+
+### 1. 최빈값 구하기
+
+```python
+from collections import Counter
+nums = [1, 1, 2, 3, 3, 3, 2, 2]
+c = Counter(nums)
+print(c.most_common(1))  # [(2, 3)]
+```
+
+### 2. 두 Counter 합치기/빼기
+
+```python
+from collections import Counter
+c1 = Counter("apple")
+c2 = Counter("apricot")
+print(c1 + c2)  # 합집합(동일 키끼리 합산)
+print(c1 - c2)  # 차집합(음수/0은 제외)
+```
+
+### 3. 문자열 아나그램 판별
+
+```python
+def is_anagram(a, b):
+    return Counter(a) == Counter(b)
+
+print(is_anagram("listen", "silent"))  # True
+```
+
+---
+
+## 정리
+
+- Counter는 데이터 빈도 분석, 최빈값, 아나그램 판별 등 다양한 곳에 활용됩니다.
+- dict와 유사하지만, 기본값이 0이고, 다양한 연산/메서드를 지원합니다.
+- collections 모듈에서 import하여 바로 사용 가능합니다.
+
+---
+
+## 추천 문제
+
+- 🔗 [LeetCode 169. Majority Element](https://leetcode.com/problems/majority-element/)
+- 🔗 [LeetCode 242. Valid Anagram](https://leetcode.com/problems/valid-anagram/)
+- 🔗 [프로그래머스 - 완주하지 못한 선수](https://school.programmers.co.kr/learn/courses/30/lessons/42576)
