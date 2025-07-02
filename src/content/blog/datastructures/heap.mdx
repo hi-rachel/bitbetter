@@ -1,0 +1,211 @@
+---
+title: "힙(Heap)"
+date: "2025-06-28"
+description: "Python으로 배우는 힙 자료구조"
+tags: ["Heap", "Python"]
+category: "Docs"
+---
+
+# 힙(Heap) 자료구조
+
+<b>힙(Heap)</b>은 완전 이진 트리를 기반으로 한 <b>
+  우선순위 큐(priority queue)
+</b>를 구현하는 데 사용되는 자료구조입니다. 가장 큰 값이나 가장 작은 값을 빠르게
+찾아야 하는 상황에서 유용하게 쓰입니다.
+
+---
+
+## 힙의 종류
+
+<table>
+  <thead>
+    <tr>
+      <th>힙 종류</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <strong>최소 힙</strong>
+      </td>
+      <td>부모 노드 ≤ 자식 노드. 루트는 가장 작은 값</td>
+    </tr>
+    <tr>
+      <td>
+        <strong>최대 힙</strong>
+      </td>
+      <td>부모 노드 ≥ 자식 노드. 루트는 가장 큰 값</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 동작 과정
+
+힙은 삽입/삭제 시 다음 규칙을 따릅니다:
+
+- **삽입:** 마지막 위치에 추가 후, 부모와 비교하며 "올라감 (heapify-up)"
+- **삭제:** 루트 제거 후 마지막 값을 루트에 넣고, 자식과 비교하며 "내려감 (heapify-down)"
+
+이로 인해 삽입/삭제 모두 시간복잡도는 <b>O(log n)</b>입니다.
+
+---
+
+## Python에서의 힙 사용
+
+Python의 표준 라이브러리 `heapq`는 <b>최소 힙(min-heap)</b>만 제공합니다.  
+최대 힙처럼 쓰려면 **값을 음수로 바꿔 저장**해야 합니다.
+
+```python
+import heapq
+
+# 최소 힙 예시
+min_heap = []
+heapq.heappush(min_heap, 3)
+heapq.heappush(min_heap, 1)
+heapq.heappush(min_heap, 5)
+
+print(heapq.heappop(min_heap))  # 1 (가장 작은 값부터 나옴)
+
+# 최대 힙 예시 (음수로 저장)
+max_heap = []
+heapq.heappush(max_heap, -3)
+heapq.heappush(max_heap, -1)
+heapq.heappush(max_heap, -5)
+
+print(-heapq.heappop(max_heap))  # 5 (가장 큰 값)
+```
+
+---
+
+## 주요 함수 정리
+
+<table>
+  <thead>
+    <tr>
+      <th>함수</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>heapq.heappush(heap, x)</code>
+      </td>
+      <td>x를 힙에 추가</td>
+    </tr>
+    <tr>
+      <td>
+        <code>heapq.heappop(heap)</code>
+      </td>
+      <td>힙에서 최소값 제거 및 반환</td>
+    </tr>
+    <tr>
+      <td>
+        <code>heapq.heapify(list)</code>
+      </td>
+      <td>리스트를 힙으로 변환</td>
+    </tr>
+    <tr>
+      <td>
+        <code>heapq.heappushpop(heap, x)</code>
+      </td>
+      <td>x를 삽입하고 최소값을 제거 후 반환</td>
+    </tr>
+    <tr>
+      <td>
+        <code>heapq.nlargest(n, iterable)</code>
+      </td>
+      <td>n개의 가장 큰 값 반환</td>
+    </tr>
+    <tr>
+      <td>
+        <code>heapq.nsmallest(n, iterable)</code>
+      </td>
+      <td>n개의 가장 작은 값 반환</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 정리
+
+- 힙은 우선순위가 높은 데이터를 빠르게 처리할 수 있도록 도와주는 **완전 이진 트리 기반 구조**입니다.
+- Python에서는 `heapq`로 최소 힙을 사용할 수 있고, 최대 힙은 음수로 변환하여 구현합니다.
+- 삽입/삭제 시간 복잡도는 O(log n)으로 효율적입니다.
+
+---
+
+## 더 알아두면 좋은 힙 관련 개념
+
+### 사용자 정의 우선순위 (튜플 활용)
+
+힙에 `(우선순위, 값)` 형태의 튜플을 삽입하면, 첫 번째 요소를 기준으로 자동 정렬됩니다.  
+이 방법은 다익스트라 알고리즘, A\* 탐색, 작업 스케줄링 등 다양한 문제에 사용됩니다.
+
+```python
+import heapq
+
+tasks = []
+heapq.heappush(tasks, (2, "write"))
+heapq.heappush(tasks, (1, "eat"))
+heapq.heappush(tasks, (3, "code"))
+
+print(heapq.heappop(tasks))  # (1, 'eat')
+```
+
+### 최대 힙 커스터마이징: 클래스 비교 연산자 재정의
+
+```python
+class MaxItem:
+    def __init__(self, val):
+        self.val = val
+    def __lt__(self, other):
+        return self.val > other.val
+
+heap = []
+heapq.heappush(heap, MaxItem(5))
+heapq.heappush(heap, MaxItem(2))
+print(heapq.heappop(heap).val)  # 5
+```
+
+---
+
+## 힙을 활용하는 대표 문제들
+
+### 🔗 [Kth Largest Element in an Array - LeetCode 215](https://leetcode.com/problems/kth-largest-element-in-an-array/)
+
+최소 힙을 사용하여 k개의 가장 큰 값을 유지하면 해결할 수 있습니다.
+
+### 🔗 [Find Median from Data Stream - LeetCode 295](https://leetcode.com/problems/find-median-from-data-stream/)
+
+두 개의 힙(최대 힙 + 최소 힙)을 유지하여 실시간으로 중앙값을 구하는 문제입니다.
+
+### 🔗 [Merge k Sorted Lists - LeetCode 23](https://leetcode.com/problems/merge-k-sorted-lists/)
+
+각 리스트의 현재 노드 값을 힙에 넣고 병합해나가는 문제입니다. 우선순위 큐의 대표적인 응용입니다.
+
+---
+
+## 힙 정렬 (Heap Sort)
+
+힙을 이용한 정렬 알고리즘도 존재합니다.
+
+```python
+import heapq
+
+def heap_sort(iterable):
+    h = []
+    for value in iterable:
+        heapq.heappush(h, value)
+    return [heapq.heappop(h) for _ in range(len(h))]
+
+print(heap_sort([4, 1, 7, 3, 8]))  # [1, 3, 4, 7, 8]
+```
+
+시간 복잡도는 O(n log n), 공간 복잡도는 O(n)입니다.
+
+---
