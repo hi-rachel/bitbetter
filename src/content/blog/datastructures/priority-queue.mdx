@@ -1,0 +1,123 @@
+---
+title: 우선순위 큐 (Priority Queue)
+date: "2025-07-02"
+description: Python에서 heap을 활용한 우선순위 큐 구현과 개념 설명
+tags: ["Heap", "Python", "Priority Queue"]
+category: "Docs"
+---
+
+# 우선순위 큐 (Priority Queue)
+
+우선순위 큐는 일반적인 큐(Queue)와 유사하지만, **데이터가 들어온 순서가 아닌 우선순위에 따라 처리되는 자료구조**입니다.
+
+---
+
+## 개념 정리
+
+- **일반 큐**: 먼저 들어온 데이터가 먼저 나감 (FIFO)
+- **우선순위 큐**: 가장 우선순위가 높은 데이터가 먼저 나감
+
+예: 응급실에서 먼저 온 환자보다 위급한 환자를 먼저 진료하는 것처럼 작동합니다.
+
+---
+
+## Python에서의 구현 방법
+
+Python에서는 `heapq` 모듈을 통해 우선순위 큐를 구현할 수 있습니다.  
+`heapq`는 **최소 힙(min heap)** 기반이므로, (우선순위, 값) 튜플을 이용해 직접 우선순위를 설정합니다.
+
+### 기본 예제
+
+```python
+import heapq
+
+pq = []
+heapq.heappush(pq, (2, 'eat'))
+heapq.heappush(pq, (1, 'sleep'))
+heapq.heappush(pq, (3, 'code'))
+
+print(heapq.heappop(pq))  # (1, 'sleep') — 우선순위가 가장 높은 항목이 먼저 나감
+```
+
+### 최대 우선순위 큐 (최대 힙)
+
+`heapq`는 최소 힙만 지원하므로, 값을 **음수로 바꾸는 방식**으로 최대 힙을 구현합니다.
+
+```python
+heapq.heappush(pq, (-priority, value))
+```
+
+### `queue.PriorityQueue` 사용 예제
+
+`queue.PriorityQueue`는 스레드 안전(thread-safe)한 우선순위 큐를 제공합니다.  
+멀티스레드 환경에서 안전하게 사용할 수 있지만, 단일 스레드에서는 `heapq`가 더 빠릅니다.
+
+```python
+from queue import PriorityQueue
+
+pq = PriorityQueue()
+pq.put((2, 'eat'))
+pq.put((1, 'sleep'))
+pq.put((3, 'code'))
+
+print(pq.get())  # (1, 'sleep') — 우선순위가 가장 높은 항목이 먼저 나감
+```
+
+- 내부적으로 최소 힙을 사용합니다.
+- `put()`으로 항목을 추가하고, `get()`으로 우선순위가 가장 높은 항목을 꺼냅니다.
+- 멀티스레드 환경에서 큐를 공유할 때 유용합니다.
+
+---
+
+## 활용 예시
+
+- 📍 Dijkstra 알고리즘 (우선순위: 현재까지의 최소 거리)
+- 📍 A\* 경로 탐색 (우선순위: 거리 + 휴리스틱)
+- 📍 운영체제 프로세스 스케줄링
+- 📍 작업 우선순위 처리 시스템
+
+---
+
+## `heapq` vs `queue.PriorityQueue`
+
+<table>
+  <thead>
+    <tr>
+      <th>항목</th>
+      <th>heapq</th>
+      <th>queue.PriorityQueue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>스레드 안전</td>
+      <td>❌ (아님)</td>
+      <td>✅ (스레드-safe)</td>
+    </tr>
+    <tr>
+      <td>성능</td>
+      <td>빠름 (간단)</td>
+      <td>느림 (락 필요)</td>
+    </tr>
+    <tr>
+      <td>사용 대상</td>
+      <td>알고리즘 / 내부 구현</td>
+      <td>멀티스레드 큐</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 정리
+
+- Python에서 우선순위 큐는 보통 `heapq`를 사용해 구현합니다.
+- `(우선순위, 값)` 튜플로 다룰 수 있으며, 우선순위 기반 로직이 필요한 알고리즘 문제에서 자주 등장합니다.
+
+---
+
+## 추천 문제
+
+- 🔗 [LeetCode 295. Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/)
+- 🔗 [LeetCode 703. Kth Largest Element in a Stream](https://leetcode.com/problems/kth-largest-element-in-a-stream/)
+- 🔗 [LeetCode 621. Task Scheduler](https://leetcode.com/problems/task-scheduler/)
