@@ -20,7 +20,7 @@ const BlogTree: React.FC<{ nodes: BlogTreeNode[]; depth?: number }> = ({
   };
 
   return (
-    <ul style={{ paddingLeft: 0 }}>
+    <ul style={{ paddingLeft: depth * 10 }}>
       {nodes.map((node) => {
         const path = node.post
           ? node.post.slug
