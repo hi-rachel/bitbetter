@@ -6,4 +6,7 @@ export const FOLDER_NAME_MAPPING: Record<string, string> = {
   javascript: "JavaScript",
   typescript: "TypeScript",
   react: "React",
+  cs: "Computer Science",
+  network: "Network",
+  http: "HTTP",
 };
