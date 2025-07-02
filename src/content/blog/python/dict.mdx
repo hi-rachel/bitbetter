@@ -1,0 +1,423 @@
+---
+title: "Python dict, defaultdict 정리"
+date: "2025-07-03"
+description: "Python의 dict 자료구조와 사용법, 특징, 예제"
+tags: ["Python", "dict", "defaultdict", "collections"]
+category: "Docs"
+---
+
+# Python의 Dictionary
+
+Python의 **dict**는 키-값 쌍을 저장하는 대표적인 해시 기반 자료구조입니다.
+
+---
+
+## dict와 defaultdict 차이
+
+- **dict**: Python의 기본적인 해시 기반 맵 자료구조. 존재하지 않는 키를 조회하면 KeyError 발생.
+- **defaultdict**: collections 모듈에 포함된 dict의 서브클래스. 존재하지 않는 키를 조회할 때, 미리 지정한 기본값을 자동으로 생성.
+
+---
+
+## import 방법
+
+```python
+# dict는 내장 자료형이므로 별도 import 필요 없음
+d = {}
+
+# defaultdict는 collections 모듈에서 import
+from collections import defaultdict
+dd = defaultdict(int)  # 기본값이 0인 딕셔너리
+```
+
+---
+
+# dict
+
+## 주요 메서드/속성 정리 (dict)
+
+<table>
+  <thead>
+    <tr>
+      <th>메서드/속성</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>get(key[, default])</code>
+      </td>
+      <td>
+        키에 해당하는 값을 반환. 없으면 default 반환(기본값 None, KeyError
+        발생하지 않음)
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>setdefault(key[, default])</code>
+      </td>
+      <td>키가 있으면 값 반환, 없으면 default로 추가 후 반환</td>
+    </tr>
+    <tr>
+      <td>
+        <code>update([other])</code>
+      </td>
+      <td>다른 dict나 (키,값) 쌍으로 현재 dict 갱신</td>
+    </tr>
+    <tr>
+      <td>
+        <code>pop(key[, default])</code>
+      </td>
+      <td>
+        키에 해당하는 값을 반환하고 삭제. 없으면 default 반환, default 없으면
+        KeyError
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>keys()</code>
+      </td>
+      <td>모든 키를 dict_keys 객체로 반환(이터러블)</td>
+    </tr>
+    <tr>
+      <td>
+        <code>values()</code>
+      </td>
+      <td>모든 값을 dict_values 객체로 반환(이터러블)</td>
+    </tr>
+    <tr>
+      <td>
+        <code>items()</code>
+      </td>
+      <td>모든 (키, 값) 쌍을 dict_items 객체로 반환(이터러블)</td>
+    </tr>
+    <tr>
+      <td>
+        <code>in</code>
+      </td>
+      <td>키 존재 여부 확인 (key in dict)</td>
+    </tr>
+    <tr>
+      <td>
+        <code>len(dict)</code>
+      </td>
+      <td>요소 개수 반환</td>
+    </tr>
+    <tr>
+      <td>
+        <code>clear()</code>
+      </td>
+      <td>모든 요소 삭제</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 사용법 (dict)
+
+```python
+d = {'a': 1, 'b': 2}
+
+# get(key[, default])
+print(d.get('a'))        # 1 (존재하면 값 반환)
+print(d.get('z'))        # None (존재하지 않으면 None 반환)
+print(d.get('z', 0))     # 0 (기본값 지정 가능)
+
+# setdefault(key[, default])
+print(d.setdefault('b', 10))  # 2 (이미 있으면 기존 값 반환)
+print(d.setdefault('c', 10))  # 10 (없으면 추가 후 반환)
+print(d)  # {'a': 1, 'b': 2, 'c': 10}
+
+# update([other])
+d.update({'a': 100, 'd': 4})
+print(d)  # {'a': 100, 'b': 2, 'c': 10, 'd': 4}
+
+# pop(key[, default])
+print(d.pop('a'))    # 100 (값 반환 및 삭제)
+print(d.pop('z', -1))# -1 (없으면 기본값 반환)
+# print(d.pop('z'))  # KeyError (기본값 없으면 예외)
+
+# keys(), values(), items()
+print(list(d.keys()))    # ['b', 'c', 'd']
+print(list(d.values()))  # [2, 10, 4]
+print(list(d.items()))   # [('b', 2), ('c', 10), ('d', 4)]
+
+# in
+print('b' in d)  # True
+print('z' in d)  # False
+
+# len(dict)
+print(len(d))    # 3
+
+# clear()
+d.clear()
+print(d)  # {}
+```
+
+---
+
+## 순회 (dict)
+
+```python
+d = {'x': 10, 'y': 20}
+
+for key, value in d.items():
+    print(key, value)
+
+# 또는
+for key in d:
+    print(key, d[key])
+```
+
+---
+
+# defaultdict
+
+## 주요 메서드/속성 정리 (defaultdict)
+
+<table>
+  <thead>
+    <tr>
+      <th>메서드/속성</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>default_factory</code>
+      </td>
+      <td>
+        기본값 생성 함수 (예: int, list, lambda 등). None이면 KeyError 발생
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>get(key[, default])</code>
+      </td>
+      <td>
+        dict와 동일. 키가 없으면 default_factory가 있으면 기본값 생성, 없으면
+        default 반환
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>setdefault(key[, default])</code>
+      </td>
+      <td>
+        dict와 동일. 키가 없으면 default_factory로 생성, default 지정 시 해당
+        값으로 추가
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>update([other])</code>
+      </td>
+      <td>dict와 동일</td>
+    </tr>
+    <tr>
+      <td>
+        <code>pop(key[, default])</code>
+      </td>
+      <td>dict와 동일</td>
+    </tr>
+    <tr>
+      <td>
+        <code>keys(), values(), items()</code>
+      </td>
+      <td>dict와 동일</td>
+    </tr>
+    <tr>
+      <td>
+        <code>in</code>
+      </td>
+      <td>dict와 동일</td>
+    </tr>
+    <tr>
+      <td>
+        <code>len(dict)</code>
+      </td>
+      <td>dict와 동일</td>
+    </tr>
+    <tr>
+      <td>
+        <code>clear()</code>
+      </td>
+      <td>dict와 동일</td>
+    </tr>
+    <tr>
+      <td>
+        <code>append(value)</code>
+      </td>
+      <td>값이 list일 때, 해당 리스트에 요소 추가. 예: dd[key].append(x)</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 사용법 (defaultdict)
+
+```python
+from collections import defaultdict
+
+dd = defaultdict(int)
+dd['x'] += 1
+print(dd['x'])  # 1
+print(dd['y'])  # 0 (키가 없어도 0 반환)
+
+# setdefault, update, pop 등 dict와 동일하게 사용 가능
+print(dd.setdefault('z', 5))  # 5
+print(dd['z'])  # 5
+
+dd.update({'a': 10})
+print(dd['a'])  # 10
+
+print(dd.pop('a'))  # 10
+
+print(list(dd.keys()))    # ['x', 'y', 'z'] (pop 이후)
+print(list(dd.values()))  # [1, 0, 5]
+print(list(dd.items()))   # [('x', 1), ('y', 0), ('z', 5)]
+```
+
+---
+
+## 순회 (defaultdict)
+
+```python
+from collections import defaultdict
+
+dd = defaultdict(list)
+dd['a'].append(1)
+dd['b'].append(2)
+
+for key, value in dd.items():
+    print(key, value)
+
+# 또는
+for key in dd:
+    print(key, dd[key])
+```
+
+---
+
+## dict와 defaultdict 차이점 요약
+
+<table>
+  <thead>
+    <tr>
+      <th>구분</th>
+      <th>dict</th>
+      <th>defaultdict</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>존재하지 않는 키 조회</td>
+      <td>KeyError 발생</td>
+      <td>기본값 자동 생성</td>
+    </tr>
+    <tr>
+      <td>기본값 지정</td>
+      <td>get(), setdefault()로 수동 지정</td>
+      <td>생성 시 지정 (int, list, lambda 등)</td>
+    </tr>
+    <tr>
+      <td>용도</td>
+      <td>일반적인 매핑</td>
+      <td>카운팅, 그룹핑 등 기본값 활용</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 활용 예시
+
+- 빈도수 집계, 빠른 데이터 조회, 매핑 테이블 등
+
+---
+
+# dict와 defaultdict 실전 활용 팁 및 주의사항
+
+## setdefault vs update 차이
+
+- **setdefault(key, value)**: 해당 키가 이미 있으면 값을 수정하지 않고 기존 값을 반환합니다. 키가 없을 때만 value로 추가합니다.
+- **update(`{key: value}`)**:
+  - 해당 키가 이미 있으면 기존 값을 덮어씁니다.
+  - 여러 키-값 쌍을 한 번에 추가/수정할 때 유용합니다.
+
+### 예시
+
+```python
+d = {'a': 1}
+d.setdefault('a', 100)  # 1 (수정 X)
+d.update({'a': 100})    # d['a'] == 100 (덮어쓰기)
+```
+
+---
+
+## 실전에서 자주 쓰는 패턴/주의사항
+
+- <b>setdefault</b>는 "기본값만 세팅"할 때, <b>update</b>는 "값을 무조건 갱신"할
+  때 사용
+- <b>defaultdict(list)</b>는 그룹핑, 집계 등에 매우 유용 (예: 키별로 값 모으기)
+- <b>defaultdict(int)</b>는 카운팅에 자주 사용 (예: 빈도수 집계)
+- <b>dict</b>는 키가 없을 때 KeyError가 나므로, get()이나 setdefault()로
+  안전하게 접근
+- <b>defaultdict</b>는 키가 없어도 자동으로 기본값이 생성되므로, 의도치 않게
+  키가 추가될 수 있음에 주의
+- <b>append</b>는 list 타입 값에만 사용 가능 (defaultdict(list)에서 자주 활용)
+
+---
+
+## 실전 예시: defaultdict(list)로 그룹핑
+
+```python
+from collections import defaultdict
+
+data = [('A', 1), ('B', 2), ('A', 3)]
+groups = defaultdict(list)
+for key, value in data:
+    groups[key].append(value)
+print(groups)  # {'A': [1, 3], 'B': [2]}
+```
+
+---
+
+## 실전 예시: defaultdict(int)로 카운팅
+
+```python
+from collections import defaultdict
+
+words = ['apple', 'banana', 'apple']
+cnt = defaultdict(int)
+for w in words:
+    cnt[w] += 1
+print(cnt)  # {'apple': 2, 'banana': 1}
+```
+
+---
+
+## 실전 예시: setdefault로 안전하게 리스트에 값 추가
+
+```python
+d = {}
+for k, v in [('A', 1), ('A', 2)]:
+    d.setdefault(k, []).append(v)
+print(d)  # {'A': [1, 2]}
+```
+
+---
+
+## 실전 예시: update로 값 덮어쓰기
+
+```python
+d = {'a': 1}
+d.update({'a': 100, 'b': 2})
+print(d)  # {'a': 100, 'b': 2}
+```
+
+---
