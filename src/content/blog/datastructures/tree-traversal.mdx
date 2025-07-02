@@ -1,7 +1,7 @@
 ---
 title: "트리 순회"
 date: "2025-06-26"
-description: "3가지 트리 순회 방식"
+description: "트리의 4가지 순회 방식"
 tags: ["Tree", "Python"]
 category: "Docs"
 ---
@@ -155,37 +155,89 @@ def postorder_iterative(root):
     return result[::-1]  # 결과를 뒤집어야 후위 순서가 됨
 ```
 
-### 전·중·후 순회 비교표
+---
+
+## ▶️ 레벨 순회 (Level-order Traversal, BFS)
+
+- 트리의 각 레벨을 위에서 아래로, 왼쪽에서 오른쪽으로 순차적으로 방문합니다.
+- DFS 방식이 아닌 **너비 우선 탐색(BFS)** 방식으로, 큐(queue)를 사용해 구현합니다.
+
+```python
+from collections import deque
+
+def level_order(root):
+    if not root:
+        return []
+
+    result = []
+    queue = deque([root])
+
+    while queue:
+        node = queue.popleft()
+        result.append(node.val)
+        if node.left:
+            queue.append(node.left)
+        if node.right:
+            queue.append(node.right)
+
+    return result
+```
+
+### 예시 트리
+
+```
+    1
+   / \
+  2   3
+ / \
+4   5
+```
+
+- 순회 결과: `[1, 2, 3, 4, 5]`
+
+### 활용 예시
+
+- 최단 경로 탐색 (BFS 기반)
+- 트리의 깊이 계산
+- 레벨별 노드 그룹화 출력
+
+---
+
+### 전위/중위/후위/레벨 순회 비교표
 
 <table>
   <thead>
     <tr>
-      <th>순회 이름</th>
-      <th>순서</th>
-      <th>특징</th>
+      <th>순회 방식</th>
+      <th>방문 순서</th>
+      <th>방식</th>
+      <th>활용 예시</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>전위</td>
-      <td>
-        <strong>루트 → 왼쪽 → 오른쪽</strong>
-      </td>
-      <td>복사/출력에 유용</td>
+      <td>전위 (Pre-order)</td>
+      <td>루트 → 왼쪽 → 오른쪽</td>
+      <td>DFS</td>
+      <td>트리 복사, 표현식 생성</td>
     </tr>
     <tr>
-      <td>중위</td>
-      <td>
-        <strong>왼쪽 → 루트 → 오른쪽</strong>
-      </td>
-      <td>BST일 경우 정렬</td>
+      <td>중위 (In-order)</td>
+      <td>왼쪽 → 루트 → 오른쪽</td>
+      <td>DFS</td>
+      <td>BST에서 정렬된 순서 출력</td>
     </tr>
     <tr>
-      <td>후위</td>
-      <td>
-        <strong>왼쪽 → 오른쪽 → 루트</strong>
-      </td>
-      <td>삭제, 계산 등 후처리에 유용</td>
+      <td>후위 (Post-order)</td>
+      <td>왼쪽 → 오른쪽 → 루트</td>
+      <td>DFS</td>
+      <td>트리 삭제</td>
+    </tr>
+    <tr>
+      <td>레벨 순회 (Level-order)</td>
+      <td>상위 레벨부터 좌→우</td>
+      <td>BFS</td>
+      <td>최단 경로 탐색, 트리 깊이 측정</td>
     </tr>
   </tbody>
 </table>
