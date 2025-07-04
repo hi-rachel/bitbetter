@@ -101,7 +101,7 @@ const TOCContainer = () => {
   };
 
   return (
-    <div className="text-sm space-y-2 fixed top-24 right-6 w-56 overflow-y-auto max-h-[calc(100vh-120px)] p-4">
+    <div className="text-sm space-y-2 fixed top-24 right-6 w-56 toc-scrollbar overflow-y-auto max-h-[calc(100vh-120px)] p-4">
       <div className="font-semibold mb-2 text-gray-700">목차</div>
       <ul className="space-y-1">
         {headings.map((heading) => (

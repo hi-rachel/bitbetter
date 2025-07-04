@@ -24,6 +24,19 @@
   background: #555;
 }
 
+.toc-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  background: transparent;
+}
+.toc-scrollbar::-webkit-scrollbar-thumb {
+  background: #e0e7ef;
+  border-radius: 2px;
+}
+.toc-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #e0e7ef transparent;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
