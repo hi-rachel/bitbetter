@@ -1,0 +1,544 @@
+---
+title: "Next.js App Router 실전 가이드: SSR/SSG/ISR/CSR, fetch 옵션, 성능 최적화까지"
+date: "2025-07-04"
+description: "Next.js App Router 기준 SSR, SSG, ISR, CSR, SPA, fetch 옵션, 캐싱, 성능 최적화, 실전 사례까지 한 번에 정리"
+tags: ["Next.js"]
+---
+
+## 1. SSR, SSG, ISR, CSR 개념 설명
+
+### SSR (Server Side Rendering)
+
+- 사용자의 요청이 들어올 때마다 서버에서 HTML을 생성해 전달합니다.
+- 항상 최신 데이터를 반영할 수 있습니다.
+- App Router에서는 별도의 `getServerSideProps` 없이 서버 컴포넌트와 `fetch`를 사용하면 SSR이 기본 동작입니다.
+
+### SSG (Static Site Generation)
+
+- 빌드 타임에 미리 HTML을 생성해 정적 파일로 서빙합니다.
+- 빠른 응답 속도와 CDN 캐싱에 유리합니다.
+- App Router에서는 `fetch`에 `cache: 'force-cache'`(기본값)를 사용하면 SSG로 동작합니다.
+  - [공식 문서 참고](https://nextjs.org/docs/app/building-your-application/data-fetching/caching#static-data-fetching-default)
+
+### ISR (Incremental Static Regeneration)
+
+- SSG의 한계를 보완해, 정적 파일을 일정 주기로 백그라운드에서 재생성합니다.
+- App Router에서는 `fetch`에 `next: { revalidate: N }` 옵션을 주면 ISR이 적용됩니다.
+  - [공식 문서 참고](https://nextjs.org/docs/app/building-your-application/data-fetching/revalidating#time-based-revalidation)
+
+### CSR (Client Side Rendering)
+
+- 브라우저에서 JS로 렌더링하며, 상태/이벤트 등 클라이언트 전용 로직을 처리합니다.
+- 컴포넌트 상단에 `'use client'`를 선언하면 해당 컴포넌트와 하위는 CSR로 동작합니다.
+
+---
+
+## 2. 'use client'가 없을 때 SSR/SSG/ISR 동작 방식과 fetch 옵션에 따른 차이
+
+- `'use client'`가 없으면 해당 파일(컴포넌트)은 <b>서버 컴포넌트(React Server Component, RSC)</b>로 동작합니다.
+- 서버 컴포넌트는 SSR, SSG, ISR 모두 지원할 수 있습니다.
+- **SSR/SSG/ISR 중 어떤 방식이 적용되는지는 fetch 옵션에 따라 달라집니다.**
+
+### fetch 옵션에 따른 동작 방식
+
+- **기본값**: fetch에 아무 옵션도 주지 않으면 `cache: 'force-cache'`가 기본값입니다. 이 경우 **SSG**(정적 사이트 생성)처럼 동작합니다. (빌드 타임에 한 번만 데이터 패칭, 정적 HTML 생성)
+- **SSR**: fetch에 `{ cache: 'no-store' }` 또는 `{ cache: 'reload' }` 옵션을 주면 **SSR**(서버사이드 렌더링)처럼 동작합니다. (매 요청마다 서버에서 데이터 패칭, HTML 생성)
+- **ISR**: fetch에 `{ next: { revalidate: N } }` 옵션을 주면 **ISR**(증분 정적 재생성)처럼 동작합니다. (정적 파일을 N초마다 백그라운드에서 재생성)
+
+#### 공식 문서 참고
+
+- [Data Fetching: Caching (SSG)](https://nextjs.org/docs/app/building-your-application/data-fetching/caching#static-data-fetching-default)
+- [Data Fetching: Revalidating Data (ISR)](https://nextjs.org/docs/app/building-your-application/data-fetching/revalidating#time-based-revalidation)
+- [Data Fetching: No Store (SSR)](https://nextjs.org/docs/app/building-your-application/data-fetching/caching#dynamic-data-fetching-no-store)
+
+### 요약
+
+- `'use client'`가 없으면 **서버 컴포넌트**로 동작
+- **SSR/SSG/ISR 중 어떤 방식이 적용되는지는 fetch 옵션에 따라 달라짐**
+  - 기본값(force-cache): SSG
+  - next.revalidate: ISR
+  - no-store: SSR
+
+## Next.js 15 이상에서 fetch 기본 동작 변화
+
+- **Next.js 14 이하**: fetch의 기본 옵션은 `cache: 'force-cache'` (SSG, 정적 캐싱)
+- **Next.js 15 이상**: fetch의 기본 옵션이 `no-store` (SSR, 매 요청마다 서버 패칭)로 변경됨
+- 즉, Next.js 15 이상에서는 별도 옵션 없이 fetch를 사용하면 <b>SSR(서버사이드 렌더링)</b>이 기본 동작입니다.
+- 정적 캐싱(SSG/ISR)을 원하면 반드시 fetch 옵션을 명시해야 합니다.
+
+> In Next.js 15, fetch defaults to no-store, meaning data is not cached by default and is always fetched on the server.  
+> [공식 문서 참고](https://nextjs.org/blog/next-15#fetch-defaults-to-no-store)
+
+---
+
+## fetch 옵션별 동작 방식 정리
+
+<table>
+  <thead>
+    <tr>
+      <th>옵션</th>
+      <th>설명</th>
+      <th>동작 방식</th>
+      <th>Next.js 버전</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>cache: 'force-cache'</td>
+      <td>정적 캐싱(빌드 타임/최초 요청 시 데이터 패칭, 이후 캐시)</td>
+      <td>SSG</td>
+      <td>14 이하(기본), 15 이상(명시 필요)</td>
+    </tr>
+    <tr>
+      <td>next: &#123; revalidate: N &#125;</td>
+      <td>N초마다 정적 파일을 백그라운드에서 재생성</td>
+      <td>ISR</td>
+      <td>14 이하/15 이상(명시 필요)</td>
+    </tr>
+    <tr>
+      <td>cache: 'no-store'</td>
+      <td>항상 서버에서 데이터 패칭, 캐싱 없음</td>
+      <td>SSR</td>
+      <td>14 이하(명시 필요), 15 이상(기본)</td>
+    </tr>
+    <tr>
+      <td>cache: 'reload'</td>
+      <td>항상 서버에서 데이터 패칭, 브라우저 캐시 무시</td>
+      <td>SSR</td>
+      <td>14 이하/15 이상(명시 필요)</td>
+    </tr>
+    <tr>
+      <td>cache: 'force-dynamic'</td>
+      <td>항상 서버에서 데이터 패칭, 정적 최적화 완전 비활성화</td>
+      <td>SSR(동적 경로 강제)</td>
+      <td>14 이하/15 이상(명시 필요)</td>
+    </tr>
+  </tbody>
+</table>
+
+- **SSG**: 정적 캐싱, 빌드 타임/최초 요청 시 데이터 패칭 후 캐시(14 이하 기본, 15 이상 명시 필요)
+- **ISR**: 일정 주기로 정적 파일 재생성(명시 필요)
+- **SSR**: 항상 서버에서 데이터 패칭(15 이상 기본, 14 이하 명시 필요)
+- **force-dynamic**: SSR + 정적 최적화 완전 비활성화(동적 경로 강제)
+
+> [공식 문서 - fetch 옵션](https://nextjs.org/docs/app/building-your-application/data-fetching/caching) > [Next.js 15 Release Candidate - fetch 기본값 변경](https://nextjs.org/blog/next-15#fetch-defaults-to-no-store)
+
+---
+
+## 3. Hydration과 Rehydration 개념
+
+### Hydration
+
+- SSR 또는 SSG로 서버에서 미리 렌더링된 정적 HTML이 브라우저에 도착한 뒤, React 등 프레임워크가 이 HTML에 이벤트 핸들러와 상태를 "붙여서" 동적인 SPA로 만드는 과정을 의미합니다.
+- 즉, 초기에는 정적인 HTML만 보이지만, JS 번들이 로드되고 나면 버튼 클릭, 입력 등 상호작용이 가능해집니다.
+- Hydration이 완료되기 전까지는 일부 인터랙션이 동작하지 않을 수 있으므로, 사용자 경험을 위해 skeleton UI, loading indicator 등을 활용하기도 합니다.
+
+### Rehydration
+
+- 기존에 이미 렌더링된 HTML을 React 등 프레임워크가 다시 분석하여, 클라이언트에서 상태/이벤트를 재적용하는 과정을 의미합니다.
+- Hydration과 거의 유사한 개념이지만, 주로 React의 Strict Mode, Fast Refresh, 또는 일부 프레임워크에서 클라이언트가 서버 HTML을 다시 "붙이는" 상황에서 사용됩니다.
+- Next.js 등에서는 일반적으로 hydration과 거의 같은 의미로 사용됩니다.
+
+---
+
+## 4. CSR과 SSR의 동작 차이 상세 비교
+
+### 렌더링 시점
+
+- **SSR**: 사용자의 요청이 들어올 때마다 서버에서 HTML을 생성해 클라이언트에 전달합니다. 브라우저는 완성된 HTML을 바로 렌더링할 수 있습니다.
+- **CSR**: 서버에서는 최소한의 HTML(shell)만 전달하고, 실제 콘텐츠는 JS가 브라우저에서 실행되며 렌더링됩니다.
+
+### SEO(검색엔진 최적화)
+
+- **SSR**: 서버에서 완성된 HTML을 제공하므로, 크롤러가 콘텐츠를 쉽게 인식할 수 있어 SEO에 매우 유리합니다.
+- **CSR**: 초기 HTML에 콘텐츠가 없고, JS 실행 후에야 렌더링되므로 SEO에 불리할 수 있습니다. (단, 최근에는 Google 등 일부 크롤러가 JS도 실행함)
+
+### 초기 로딩 속도
+
+- **SSR**: 첫 화면이 빠르게 보입니다. 서버에서 HTML을 바로 내려주기 때문입니다.
+- **CSR**: JS 번들 다운로드 및 실행, 데이터 패칭 후 렌더링이 이뤄지므로 첫 화면이 늦게 보일 수 있습니다.
+
+### 상호작용 및 사용자 경험
+
+- **SSR**: 초기에는 정적 HTML만 보이고, hydration이 끝나야 상호작용이 가능합니다. hydration 지연 시 skeleton UI 등으로 보완 필요.
+- **CSR**: JS가 로드되면 바로 상호작용이 가능하지만, 그 전까지는 아무런 인터랙션도 불가합니다.
+
+### 데이터 최신성
+
+- **SSR**: 매 요청마다 서버에서 최신 데이터를 반영할 수 있습니다.
+- **CSR**: 클라이언트에서 직접 API를 호출해 데이터를 가져오므로, 실시간 데이터 반영이 용이합니다.
+
+### 요약
+
+- SSR은 초기 렌더링, SEO, 최신 데이터에 강점이 있고, CSR은 동적 UI, 빠른 페이지 전환, 복잡한 상호작용에 강점이 있습니다. Next.js에서는 두 방식을 혼합해 사용할 수 있습니다.
+
+---
+
+## 5. 실시간 데이터(대시보드, 마이페이지 등)에서 SSR vs CSR
+
+### SSR의 장점
+
+- 사용자가 페이지에 진입할 때마다 서버에서 최신 데이터를 패칭하여 HTML을 생성하므로, 항상 최신 상태를 보장할 수 있습니다.
+- 로그인/인증이 필요한 페이지(마이페이지 등)에서 보안과 데이터 일관성 측면에서 유리합니다.
+- SEO가 필요한 실시간 데이터 페이지에도 적합합니다.
+
+### CSR의 장점
+
+- 클라이언트에서 직접 API를 호출해 데이터를 가져오므로, 사용자가 페이지에 머무는 동안 실시간으로 데이터를 갱신할 수 있습니다.
+- WebSocket, polling, SWR, React Query 등 다양한 클라이언트 데이터 패칭 라이브러리와 연동이 쉽습니다.
+- 서버 부하를 줄이고, 복잡한 상호작용이 많은 대시보드, 실시간 알림, 채팅 등에는 CSR이 적합할 수 있습니다.
+
+### 선택 기준
+
+- SEO, 첫 화면 속도, 인증/보안이 중요하다면 SSR을 우선 고려합니다.
+- 실시간 갱신, 사용자 상호작용, 클라이언트 상태 관리가 중요하다면 CSR을 적극 활용합니다.
+- 필요에 따라 SSR과 CSR을 혼합하여 사용할 수 있습니다.
+
+---
+
+## 6. 혼합 전략: 서버 컴포넌트에서 데이터 패칭, 클라이언트 컴포넌트에서 UI/이벤트 처리
+
+Next.js App Router에서는 서버 컴포넌트에서 데이터를 패칭하고, 클라이언트 컴포넌트에서 UI 상태/이벤트를 처리하는 패턴을 권장합니다.
+
+### 예시 코드
+
+```tsx
+// app/dashboard/page.tsx (서버 컴포넌트)
+import UserChart from "./UserChart";
+
+export default async function DashboardPage() {
+  const res = await fetch("https://api.example.com/stats", {
+    cache: "no-store",
+  });
+  const stats = await res.json();
+
+  return (
+    <div>
+      <h1>대시보드</h1>
+      <UserChart data={stats.chartData} />
+    </div>
+  );
+}
+```
+
+```tsx
+// app/dashboard/UserChart.tsx (클라이언트 컴포넌트)
+"use client";
+import { useState } from "react";
+
+export default function UserChart({ data }) {
+  const [highlight, setHighlight] = useState(false);
+
+  return (
+    <div>
+      <button onClick={() => setHighlight((h) => !h)}>하이라이트 토글</button>
+      {/* 실제 차트 렌더링 */}
+      <pre style={{ background: highlight ? "yellow" : "white" }}>
+        {JSON.stringify(data, null, 2)}
+      </pre>
+    </div>
+  );
+}
+```
+
+- [공식 문서 참고](https://nextjs.org/docs/app/building-your-application/data-fetching/patterns#fetching-data-on-the-server-and-client)
+
+---
+
+## 7. 성능 최적화: 코드 스플리팅, dynamic import, React.memo 등 예시
+
+### 코드 스플리팅 & dynamic import
+
+```tsx
+// app/page.tsx
+import dynamic from "next/dynamic";
+
+// 무거운 컴포넌트는 동적으로 import
+const HeavyChart = dynamic(() => import("./HeavyChart"), {
+  loading: () => <p>로딩 중...</p>,
+  ssr: false, // 클라이언트에서만 렌더링
+});
+
+export default function Page() {
+  return (
+    <div>
+      <h1>메인 페이지</h1>
+      <HeavyChart />
+    </div>
+  );
+}
+```
+
+- [공식 문서 참고](https://nextjs.org/docs/app/guides/lazy-loading)
+
+### 코드 스플리팅 & dynamic import란?
+
+- **코드 스플리팅**은 앱의 전체 JS 번들을 여러 개의 작은 청크로 나누어, 필요한 시점에만 각 청크를 로드하는 기법입니다.
+- **dynamic import**는 특정 컴포넌트나 모듈을 실제로 필요할 때(예: 특정 페이지 진입, 버튼 클릭 등) 비동기로 불러오는 방법입니다.
+- Next.js에서는 `next/dynamic`을 활용해 동적 import가 가능합니다.
+- <b>Lazy loading(지연 로딩)</b>은 사용자가 실제로 해당 컴포넌트나 리소스를
+  필요로 할 때까지 로딩을 미루는 전략입니다. 예를 들어, 스크롤을 내릴 때마다
+  이미지를 불러오거나, 특정 탭을 클릭할 때만 무거운 컴포넌트를 로드하는
+  방식입니다.
+
+#### 어떤 식으로 성능 최적화에 기여하나?
+
+- 초기 페이지 로딩 시 불필요한 JS 코드까지 모두 다운로드하지 않고, **필요한 코드만 먼저 로드**하므로 초기 로딩 속도가 빨라집니다.
+- 무거운 컴포넌트(예: 차트, 에디터 등)는 실제로 필요할 때만 로드하여, **메인 번들 크기를 줄이고, UX를 개선**할 수 있습니다.
+- 사용자가 방문하지 않는 경로의 코드는 다운로드되지 않으므로, 전체 앱의 네트워크 트래픽과 렌더링 비용이 줄어듭니다.
+- Lazy loading을 활용하면, 사용자가 실제로 해당 기능을 사용할 때만 리소스를 불러오기 때문에, **불필요한 리소스 낭비를 줄이고, 앱의 반응성을 높일 수 있습니다.**
+
+### dynamic import와 Suspense의 차이, 그리고 실무적 활용법
+
+Next.js에서 dynamic import를 사용하면 자동으로 Lazy loading(지연 로딩)이 적용됩니다. 하지만 Suspense로 감싸는 경우와 그렇지 않은 경우에는 동작 방식과 실무적 활용에 차이가 있습니다.
+
+#### 1. Suspense 없이 dynamic import (기본)
+
+- `next/dynamic`을 사용할 때 `suspense: false`(기본값)이면, 로딩 중 UI는 `loading` 옵션으로 처리합니다.
+- Next.js가 내부적으로 로딩 상태를 관리하며, React의 Suspense 기능은 사용하지 않습니다.
+
+```tsx
+const Chart = dynamic(() => import("./Chart"), {
+  loading: () => <div>로딩 중...</div>,
+  // suspense: false (기본값)
+});
+```
+
+#### 2. Suspense로 감싸는 경우 (`suspense: true`)
+
+- `next/dynamic`에 `suspense: true`를 주면, React의 Suspense 메커니즘을 사용하게 됩니다.
+- 반드시 `<Suspense fallback={...}>`으로 감싸야 하며, 로딩 중 UI는 Suspense의 `fallback`으로 지정합니다.
+
+```tsx
+import { Suspense } from "react";
+const Chart = dynamic(() => import("./Chart"), { suspense: true });
+
+<Suspense fallback={<div>로딩 중...</div>}>
+  <Chart />
+</Suspense>;
+```
+
+#### 3. 실무적 차이점
+
+<table>
+  <thead>
+    <tr>
+      <th>구분</th>
+      <th>Suspense 없이(dynamic import)</th>
+      <th>Suspense 사용 (`suspense: true`)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>로딩 UI 지정 방식</td>
+      <td>
+        <code>loading</code> 옵션
+      </td>
+      <td>
+        <code>&lt;Suspense fallback=...&gt;</code>
+      </td>
+    </tr>
+    <tr>
+      <td>감싸야 하는가?</td>
+      <td>필요 없음</td>
+      <td>반드시 Suspense로 감싸야 함</td>
+    </tr>
+    <tr>
+      <td>여러 컴포넌트 제어</td>
+      <td>각각 따로 로딩 UI</td>
+      <td>여러 컴포넌트 한 번에 로딩 UI 제어 가능</td>
+    </tr>
+    <tr>
+      <td>React 생태계 연동</td>
+      <td>제한적</td>
+      <td>React Suspense 생태계와 완전 호환</td>
+    </tr>
+    <tr>
+      <td>서버 컴포넌트에서</td>
+      <td>사용 불가</td>
+      <td>Suspense로 감싸면 서버 컴포넌트에서도 가능</td>
+    </tr>
+  </tbody>
+</table>
+
+#### 4. 언제 Suspense를 써야 할까?
+
+- 여러 개의 lazy 컴포넌트를 한 번에 로딩 UI로 감싸고 싶을 때
+- 서버 컴포넌트에서 클라이언트 컴포넌트를 lazy하게 import할 때
+- React의 최신 Suspense 기능(예: 데이터 패칭, 트랜지션 등)과 연동하고 싶을 때
+
+#### 5. 결론
+
+- 단순히 한두 개의 컴포넌트만 lazy하게 로드할 땐 `loading` 옵션만으로 충분합니다.
+- 여러 컴포넌트의 로딩 상태를 통합 관리하거나, 서버 컴포넌트와 연동, React의 최신 Suspense 기능을 활용하고 싶을 때는 Suspense로 감싸는 것이 좋습니다.
+
+- [Next.js 공식 dynamic import 문서](https://nextjs.org/docs/app/building-your-application/optimizing/lazy-loading)
+- [React Suspense 공식 문서](https://react.dev/reference/react/Suspense)
+
+---
+
+### React.memo 예시
+
+```tsx
+import React from "react";
+
+const ExpensiveList = React.memo(function ExpensiveList({ items }) {
+  // items가 바뀌지 않으면 리렌더링 방지
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item.id}>{item.value}</li>
+      ))}
+    </ul>
+  );
+});
+```
+
+- [공식 문서 참고](https://ko.react.dev/reference/react/memo)
+
+### React.memo란?
+
+- **React.memo**는 props가 변경되지 않으면 컴포넌트의 리렌더링을 방지하는 고차 컴포넌트(HOC)입니다.
+- 동일한 props로 여러 번 렌더링되는 상황에서, 불필요한 연산과 DOM 업데이트를 줄여줍니다.
+
+#### HOC(고차 컴포넌트)란?
+
+- <b>HOC(High Order Component, 고차 컴포넌트)</b>는 컴포넌트를 인자로 받아
+  새로운 컴포넌트를 반환하는 함수입니다.
+- 예시: `const Enhanced = hoc(OriginalComponent)`
+
+#### 어떤 식으로 성능 최적화에 기여하나?
+
+- 리스트, 테이블 등 많은 자식 컴포넌트가 있는 경우, 부모 컴포넌트가 리렌더링되어도 **실제로 변경된 자식만 리렌더링**되도록 하여 렌더링 비용을 최소화합니다.
+- 복잡한 연산이 필요한 컴포넌트(예: 차트, 대용량 리스트 등)에 적용하면, **불필요한 연산과 DOM 업데이트를 줄여** 앱의 반응성과 성능을 높일 수 있습니다.
+
+---
+
+## 8. 렌더링 전략별 실무 활용 빈도와 대표 사례
+
+- **SSG**: 정적 사이트 생성. 빌드 시점에 모든 페이지를 미리 만들어두므로, 속도가 매우 빠르고 트래픽이 많아도 서버 부하가 적음. SEO에 최적. (예: 블로그, 마케팅 랜딩)
+- **ISR**: 증분 정적 생성. SSG처럼 미리 만들어두지만, 일정 주기마다(혹은 요청 시) 백그라운드에서 새로 생성. 실시간성도 어느 정도 챙기면서 SSG의 장점 유지. (예: 뉴스, 상품 상세)
+- **SSR**: 서버사이드 렌더링. 매 요청마다 서버에서 최신 데이터를 반영해 HTML 생성. 로그인/권한, 실시간 데이터, 개인화가 중요한 페이지에 적합. (예: 마이페이지, 관리자, 검색)
+- **CSR**: 클라이언트사이드 렌더링. 초기 진입 시 최소한의 HTML만 받고, 이후 모든 렌더링을 브라우저에서 처리. SEO가 필요 없고, 실시간성이 매우 중요한 내부 서비스, 채팅, 대시보드 등에 적합.
+
+---
+
+## 9. 요약 표
+
+<table>
+  <thead>
+    <tr>
+      <th>구분</th>
+      <th>설명</th>
+      <th>Next.js App Router 적용</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SSR</td>
+      <td>요청마다 서버에서 HTML 생성, 항상 최신 데이터</td>
+      <td>`fetch` 등 서버 데이터 패칭 시 SSR</td>
+    </tr>
+    <tr>
+      <td>SSG</td>
+      <td>빌드 타임에 정적 HTML 생성, 빠른 응답</td>
+      <td>`fetch`에 `cache: 'force-cache'`(기본값) 사용</td>
+    </tr>
+    <tr>
+      <td>ISR</td>
+      <td>정적 파일을 일정 주기로 재생성, 최신성+성능</td>
+      <td>`fetch`에 `next: { revalidate: N }` 옵션 사용</td>
+    </tr>
+    <tr>
+      <td>CSR</td>
+      <td>브라우저에서 JS로 렌더링, 클라이언트 전용</td>
+      <td>컴포넌트 상단에 `'use client'` 선언</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 10. 참고 자료
+
+- [Next.js 공식 문서 - Data Fetching](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching)
+- [Next.js 공식 문서 - Rendering](https://nextjs.org/docs/app/building-your-application/rendering)
+- [Next.js 공식 블로그 - App Router](https://nextjs.org/blog/next-13)
+- [Next.js 공식 문서 - Data Fetching Patterns](https://nextjs.org/docs/app/building-your-application/data-fetching/patterns#fetching-data-on-the-server-and-client)
+
+---
+
+## 11. 추가 개념 정리 - SPA(Single Page Application) 개념, Next.js와의 관계
+
+### SPA란?
+
+- <b>SPA(Single Page Application)</b>는 웹사이트 전체가 하나의 HTML 페이지로
+  구성되어, 페이지 이동 시 전체 페이지를 새로고침하지 않고 필요한 부분만
+  동적으로 갱신하는 방식의 웹 애플리케이션입니다.
+- React, Vue, Angular 등 대부분의 현대 프론트엔드 프레임워크가 SPA 개발을 지원합니다.
+
+### 특징
+
+- 최초 진입 시 한 번만 HTML, JS, CSS 등 리소스를 받아오고, 이후에는 브라우저에서 JS가 라우팅과 렌더링을 담당합니다.
+- 페이지 전환이 빠르고, 부드러운 사용자 경험(UX)을 제공합니다.
+- 클라이언트 사이드 라우팅(History API 등)을 사용합니다.
+
+### 장점
+
+- 빠른 페이지 전환(전체 새로고침 없이 부분 렌더링)
+- 풍부한 인터랙션과 동적 UI 구현에 유리
+- 모바일 앱과 유사한 사용자 경험 제공
+
+### 단점
+
+- 초기 로딩 시 JS 번들 크기가 커질 수 있음
+- SEO(검색엔진 최적화)에 불리(초기 HTML에 콘텐츠가 없음)
+- 첫 진입 시 데이터 패칭, 렌더링까지 시간이 걸릴 수 있음
+
+---
+
+### Next.js와 SPA의 관계
+
+- Next.js는 기본적으로 SSR/SSG/ISR 등 다양한 렌더링 방식을 지원하지만, `'use client'`를 선언한 컴포넌트나 CSR 방식으로 동작하는 부분은 SPA와 동일하게 동작합니다.
+- Next.js로 만든 앱도 내부적으로는 SPA의 장점을 살리면서, SSR/SSG/ISR 등으로 SEO와 초기 로딩 속도를 보완할 수 있습니다.
+- 즉, Next.js는 SPA의 장점(빠른 전환, 동적 UI)과 MPA(서버 렌더링, SEO) 장점을 모두 취할 수 있는 프레임워크입니다.
+
+### SPA 방식의 성능 최적화와 활용 시점
+
+- SPA는 전체 페이지를 새로고침하지 않고 필요한 부분만 동적으로 갱신하므로, **페이지 전환 시 네트워크 트래픽과 렌더링 비용을 크게 줄일 수 있습니다.**
+- 클라이언트 사이드 라우팅, 코드 스플리팅, lazy loading, 캐싱 등 다양한 최적화 기법과 결합하면, 대규모 앱에서도 빠른 UX를 제공할 수 있습니다.
+- **언제 SPA 방식을 쓰면 좋은가?**
+  - 사용자 상호작용이 많고, 페이지 전환이 빈번하며, 실시간 데이터 갱신이 중요한 대시보드, 채팅, 이메일, 프로젝트 관리 툴 등 복잡한 웹앱에 적합합니다.
+  - SEO가 크게 중요하지 않거나, 로그인 이후 내부 페이지(마이페이지, 관리자 페이지 등)에서 많이 활용됩니다.
+- 반면, 검색엔진 노출이 중요한 마케팅/블로그/문서 사이트 등은 SSR/SSG/ISR과 혼합하는 것이 좋습니다.
+
+---
+
+### 클라이언트 사이드 라우팅이란?
+
+- <b>클라이언트 사이드 라우팅(Client-side Routing)</b>은 사용자가 페이지 내에서
+  다른 경로(주소)로 이동할 때, 브라우저가 전체 페이지를 새로고침하지 않고,
+  자바스크립트가 필요한 부분만 동적으로 바꿔주는 방식입니다.
+- 전통적인 웹(서버 사이드 라우팅)에서는 주소가 바뀔 때마다 서버에 새 요청을 보내고, 전체 HTML을 다시 받아옵니다.
+- 반면, 클라이언트 사이드 라우팅은 **초기 진입 시 필요한 JS/HTML/CSS만 받아오고, 이후 경로 변경은 JS가 처리**합니다. 그래서 페이지 전환이 매우 빠르고, 앱처럼 부드러운 UX를 제공합니다.
+
+#### Next.js에서의 클라이언트 사이드 라우팅
+
+- Next.js는 내부적으로 React의 SPA 라우팅 방식을 사용합니다.
+- 사용자가 `<Link href="/about">` 등으로 이동하면, 브라우저는 전체 새로고침 없이 필요한 데이터/컴포넌트만 비동기로 불러와 화면을 갱신합니다.
+- 이 덕분에 **초기 진입은 SSR/SSG/ISR로 SEO와 속도를 챙기고, 이후 라우팅은 SPA처럼 빠르게 동작**합니다.
+- Next.js의 App Router 환경에서는 서버 컴포넌트와 클라이언트 컴포넌트가 혼합되어 동작하지만, 라우팅 자체는 클라이언트 사이드에서 처리됩니다.
+
+---
+
+## 마무리
+
+Next.js SSR, SSG, CSR, ISR 등등 연관되는 개념들이 많아서 포스팅이 길어졌네요 🙌
+
+해당 포스팅이 정리에 도움이 됐으면 좋겠습니다!
+
+실무에서 실제로 캐시나 렌더링 최적화를 다룰 일들이 생기고, 이해하지 못하고 쓰면 예상치 못한 버그가 발생할 수 있습니다.
+
+올바르게 활용하기 위해 사용하는 버전과 공식문서를 항상 참고할 것을 추천합니다 🙂
+
+---
