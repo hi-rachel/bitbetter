@@ -1,0 +1,425 @@
+---
+title: "JavaScript this 바인딩 알아보기: 개념, 4가지 바인딩 규칙, 다양한 상황별 정리"
+date: "2025-07-05"
+description: "JavaScript의 this는 어떻게 바인딩될까?"
+tags: ["JavaScript", "this"]
+---
+
+자바스크립트의 **this 바인딩**은 함수 호출 방식, 실행 컨텍스트, strict mode, 클래스, 화살표 함수 등 다양한 요소에 따라 동적으로 결정됩니다.
+이 글에서는 this의 바인딩 규칙과 우선순위, 다양한 상황별 this 바인딩에 대해 정리해보겠습니다.
+
+---
+
+## 1. this란 무엇인가?
+
+- 자바스크립트에서 this는 **함수가 어떻게 호출되었는지에 따라 동적으로 결정되는 특별한 식별자**입니다.
+- 객체, 함수, 클래스, 이벤트, 콜백 등 다양한 상황에서 this가 가리키는 값이 달라집니다.
+
+---
+
+## 2. this 바인딩의 4가지 규칙
+
+### 1) 기본 바인딩 (Default Binding)
+
+- 단순 함수 호출: this는 전역 객체(window/global) 또는 strict mode에서는 undefined
+
+```js
+function foo() {
+  console.log(this);
+}
+foo(); // window (브라우저) 또는 undefined (strict mode)
+```
+
+### 2) 암시적 바인딩 (Implicit Binding)
+
+- 객체의 메서드로 호출: this는 해당 객체
+
+```js
+const obj = {
+  name: "Raina",
+  say() {
+    console.log(this.name);
+  },
+};
+obj.say(); // "Raina"
+```
+
+### 3) 명시적 바인딩 (Explicit Binding)
+
+- call/apply/bind로 this를 직접 지정
+
+```js
+function greet() {
+  console.log(this.name);
+}
+const user = { name: "Raina" };
+greet.call(user); // "Raina"
+```
+
+### 4) new 바인딩 (Constructor Binding)
+
+- 생성자 함수로 호출: this는 새로 생성된 인스턴스
+
+```js
+function Person(name) {
+  this.name = name;
+}
+const p = new Person("Raina");
+console.log(p.name); // "Raina"
+```
+
+#### 바인딩 우선순위
+
+- **new > 명시적 > 암시적 > 기본**
+
+---
+
+## 3. strict mode에서의 this
+
+- strict mode에서는 단순 함수 호출 시 this가 undefined가 됩니다.
+- 실수 방지, 보안 강화 목적
+
+```js
+"use strict";
+function foo() {
+  console.log(this);
+}
+foo(); // undefined
+```
+
+---
+
+## 4. call/apply/bind로 this 제어
+
+- call, apply, bind는 함수의 this를 원하는 값으로 명시적으로 바꿀 수 있습니다.
+- call: 쉼표로 인자, apply: 배열로 인자, bind: this와 인자 고정(새 함수 반환)
+
+<table>
+  <thead>
+    <tr>
+      <th>메서드</th>
+      <th>즉시 실행</th>
+      <th>this 바인딩</th>
+      <th>인자 전달 방식</th>
+      <th>결과</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>.call()</td>
+      <td>✅</td>
+      <td>직접 지정</td>
+      <td>쉼표</td>
+      <td>바로 실행</td>
+    </tr>
+    <tr>
+      <td>.apply()</td>
+      <td>✅</td>
+      <td>직접 지정</td>
+      <td>배열</td>
+      <td>바로 실행</td>
+    </tr>
+    <tr>
+      <td>.bind()</td>
+      <td>❌</td>
+      <td>직접 지정</td>
+      <td>쉼표</td>
+      <td>this 고정된 함수 반환</td>
+    </tr>
+  </tbody>
+</table>
+
+### 코드 예시
+
+```js
+function sayHello(greeting, name) {
+  console.log(`${greeting}, ${name}! My this.name is ${this.name}`);
+}
+const context = { name: "Raina" };
+
+sayHello.call(context, "Hi", "You"); // Hi, You! My this.name is Raina
+sayHello.apply(context, ["Hello", "World"]); // Hello, World! My this.name is Raina
+const boundHello = sayHello.bind(context, "Hey");
+boundHello("Everyone"); // Hey, Everyone! My this.name is Raina
+```
+
+---
+
+## 5. 화살표 함수(arrow function)와 this
+
+- 화살표 함수는 자신만의 this를 가지지 않고, <b>상위 스코프의 this(lexical this)</b>를 그대로 사용합니다.
+- 콜백, setTimeout, 클래스 필드 등에서 this 바인딩 문제를 자연스럽게 해결
+
+### 코드 예시
+
+```js
+const obj = {
+  name: "Raina",
+  sayLater() {
+    setTimeout(() => {
+      console.log(this.name); // Raina
+    }, 1000);
+  },
+};
+obj.sayLater();
+```
+
+---
+
+## 6. 클래스, 프로토타입, 상속에서의 this
+
+- 클래스 메서드에서 this는 인스턴스를 가리킴
+- 프로토타입 체인, 상속 구조에서의 this 동작
+- super와 this의 관계
+
+```js
+class Animal {
+  speak() {
+    console.log(this.type);
+  }
+}
+class Dog extends Animal {
+  constructor() {
+    super();
+    this.type = "Dog";
+  }
+}
+const d = new Dog();
+d.speak(); // "Dog"
+```
+
+---
+
+## 7. 클로저/내부 함수에서의 this
+
+> <b>클로저란?</b>
+> <br />
+> 클로저는 부모 함수가 이미 실행을 마친 뒤에도, 자식 함수가 부모 함수의
+> 범위(스코프)에 있던 변수와 환경을 계속 기억하고 접근할 수 있게 해주는
+> 자바스크립트의 기능입니다. 즉, 함수가 선언될 때의 지역 변수와 환경이, 그
+> 함수가 반환된 후에도 자식 함수 내부에서 유지됩니다.
+
+자바스크립트에서 함수 안에 또 다른 함수를 선언(중첩 함수, 클로저)하면, 내부 함수의 this는 바깥 함수의 this와 다를 수 있습니다. 이럴 때 바깥 함수의 this를 변수에 저장해서 내부 함수에서 참조하는 고전적인 방법이 바로 **"var self = this" 패턴**입니다.
+
+### this가 달라지는 상황
+
+```js
+const obj = {
+  value: 42,
+  outer() {
+    console.log(this.value); // 42 (obj를 가리킴)
+    function inner() {
+      console.log(this.value); // undefined (전역 객체 또는 undefined)
+    }
+    inner();
+  },
+};
+obj.outer();
+```
+
+- `outer` 함수의 this는 obj를 가리키지만,
+- `inner` 함수의 this는 단순 함수 호출이므로 전역 객체(window) 또는 strict mode에서는 undefined가 됩니다.
+
+### "var self = this" 패턴 사용
+
+```js
+const obj = {
+  value: 42,
+  outer() {
+    var self = this; // 바깥 this를 self에 저장
+    function inner() {
+      console.log(self.value); // 42 (self는 obj를 가리킴)
+    }
+    inner();
+  },
+};
+obj.outer();
+```
+
+- 바깥 함수의 this를 self(또는 that 등)라는 변수에 저장해두고,
+- 내부 함수에서 this 대신 self를 사용하면 항상 바깥 this(obj)를 참조할 수 있습니다.
+
+### 최신 방식: 화살표 함수 사용
+
+ES6 이후에는 화살표 함수가 상위 스코프의 this를 자동으로 물려받으므로 "var self = this" 패턴 대신 화살표 함수를 쓰는 것이 더 간단하고 안전합니다.
+
+```js
+const obj = {
+  value: 42,
+  outer() {
+    const inner = () => {
+      console.log(this.value); // 42 (화살표 함수는 바깥 this를 그대로 사용)
+    };
+    inner();
+  },
+};
+obj.outer();
+```
+
+**정리:**
+
+- "var self = this" 패턴은 내부 함수에서 바깥 this를 참조하기 위한 고전적인 방법입니다.
+- 최신 자바스크립트에서는 화살표 함수를 사용하면 더 간단하게 같은 효과를 얻을 수 있습니다.
+
+---
+
+## 8. 이벤트 핸들러/타이머에서의 this
+
+- addEventListener, setTimeout 등에서 this가 DOM 요소/전역 객체가 될 수 있음
+- .bind(), 화살표 함수로 안전하게 고정
+
+### 코드 예시 (순수 JS)
+
+```js
+function Button() {
+  this.text = "클릭!";
+  this.handleClick = function () {
+    console.log(this.text);
+  };
+}
+const btn = new Button();
+document.body.addEventListener("click", btn.handleClick.bind(btn)); // 클릭 시 "클릭!"
+```
+
+### 코드 예시 (setTimeout)
+
+```js
+const obj = {
+  name: "Raina",
+  say() {
+    console.log(this.name);
+  },
+};
+setTimeout(obj.say, 1000); // undefined (this 잃음)
+setTimeout(obj.say.bind(obj), 1000); // Raina
+```
+
+---
+
+## 9. rest parameter와 Math.max() 활용법
+
+### rest parameter란?
+
+rest parameter(나머지 매개변수)는 함수의 매개변수에서 ...을 사용해, 전달된 인자들을 배열로 한 번에 받을 수 있게 해주는 ES6 문법입니다.\
+이전의 arguments 객체와 달리, 진짜 배열(Array)이기 때문에 map, forEach 등 배열 메서드를 바로 쓸 수 있습니다.
+
+#### 예시: rest parameter
+
+```js
+function sum(...numbers) {
+  return numbers.reduce((acc, cur) => acc + cur, 0);
+}
+
+console.log(sum(1, 2, 3)); // 6
+console.log(sum(10, 20)); // 30
+```
+
+- ...numbers는 전달된 모든 인자를 배열로 받습니다.
+
+---
+
+### Math.max()와 인자 전달
+
+`Math.max()`는 여러 개의 숫자 인자를 받아 그 중 가장 큰 값을 반환합니다.\
+하지만 배열을 직접 넘기면 동작하지 않습니다.
+
+#### 잘못된 예시
+
+```js
+const arr = [1, 2, 3];
+console.log(Math.max(arr)); // NaN
+```
+
+#### 올바른 예시: spread 연산자 사용
+
+```js
+const arr = [1, 2, 3];
+console.log(Math.max(...arr)); // 3
+```
+
+- ...arr은 배열의 각 요소를 개별 인자로 펼쳐줍니다.
+  > 여기서 ... 연산자(스프레드 연산자)는 배열이나 객체의 값을 한 칸씩 '펼쳐서' 전달할 때 사용합니다.
+  > 예) Math.max(...[1, 2, 3])는 Math.max(1, 2, 3)과 같습니다.
+
+#### apply를 사용한 예전 방식
+
+```js
+const arr = [1, 2, 3];
+console.log(Math.max.apply(null, arr)); // 3
+```
+
+- ES6 이전에는 apply를 사용해 배열을 인자로 넘겼습니다.
+
+---
+
+## 10. 실전 활용 요약
+
+### this 바인딩 우선순위
+
+this가 어떤 값을 가리키는지 결정하는 우선순위는 다음과 같습니다.
+
+<table>
+  <thead>
+    <tr>
+      <th>우선순위</th>
+      <th>바인딩 방식</th>
+      <th>this 값</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>new 바인딩</td>
+      <td>새로 생성된 인스턴스</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>명시적 바인딩 (call/apply/bind)</td>
+      <td>명시적으로 지정한 값</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>암시적 바인딩 (객체의 메서드 호출)</td>
+      <td>해당 객체</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>기본 바인딩 (단순 함수 호출)</td>
+      <td>전역 객체(window/global) 또는 undefined(strict mode)</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>화살표 함수</td>
+      <td>상위 스코프의 this(lexical this)</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+### 실전 팁
+
+- this 바인딩 우선순위를 항상 기억하세요: new > 명시적 > 암시적 > 기본 > (화살표 함수는 예외적으로 상위 스코프)
+- call/apply/bind로 this를 명확하게 제어할 수 있습니다.
+- bind + partial application(부분 적용)으로 인자 일부를 미리 고정한 함수 생성이 가능합니다.
+  ```js
+  function multiply(a, b) {
+    return a * b;
+  }
+  const double = multiply.bind(null, 2);
+  double(5); // 10
+  ```
+- 화살표 함수는 this 바인딩 문제를 자연스럽게 해결합니다(상위 스코프의 this 사용).
+- ES6+에서는 rest parameter, spread 연산자, Array.from 등을 적극 활용하세요.
+- 의심스러울 땐 항상 콘솔로 this가 무엇을 가리키는지 직접 확인해보세요!
+
+---
+
+### 참고 자료
+
+- [MDN - this](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Operators/this)
+- [MDN - Function.prototype.call](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Function/call)
+- [MDN - Function.prototype.apply](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Function/apply)
+- [MDN - Function.prototype.bind](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Function/bind)
+- [MDN - Arrow functions](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
+- [MDN - Classes](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Classes)
