@@ -44,3 +44,6 @@ next-env.d.ts
 TODO.md
 
 .contentlayer/
+
+/src/app/test_list
+/src/app/temp_content
