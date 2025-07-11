@@ -63,7 +63,7 @@ const MDXRenderer = ({ code }: MDXRendererProps): React.ReactElement => {
     ),
     p: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
       <p
-        className="text-sm sm:text-base md:text-lg leading-6 sm:leading-7 md:leading-8 text-gray-800 dark:text-gray-200 mb-4 sm:mb-5 md:mb-6"
+        className="text-sm sm:text-base md:text-lg leading-6 sm:leading-7 md:leading-8 text-gray-800 mb-4 sm:mb-5 md:mb-6"
         {...props}
       >
         {children}
@@ -87,7 +87,7 @@ const MDXRenderer = ({ code }: MDXRendererProps): React.ReactElement => {
       ...props
     }: React.HTMLAttributes<HTMLQuoteElement>) => (
       <blockquote
-        className="border-l-4 pl-3 sm:pl-4 italic text-sm sm:text-base text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-700 my-4 sm:my-5 md:my-6"
+        className="border-l-4 pl-3 sm:pl-4 italic text-sm sm:text-base text-gray-600 border-gray-300 my-4 sm:my-5 md:my-6"
         {...props}
       >
         {children}
@@ -154,7 +154,7 @@ const MDXRenderer = ({ code }: MDXRendererProps): React.ReactElement => {
       ...props
     }: React.HTMLAttributes<HTMLTableCellElement>) => (
       <th
-        className="border border-gray-300 dark:border-gray-700 px-2 sm:px-3 md:px-4 py-2 text-left font-semibold"
+        className="border border-gray-300 px-2 sm:px-3 md:px-4 py-2 text-left font-semibold"
         {...props}
       >
         {children}
@@ -165,7 +165,7 @@ const MDXRenderer = ({ code }: MDXRendererProps): React.ReactElement => {
       ...props
     }: React.HTMLAttributes<HTMLTableCellElement>) => (
       <td
-        className="border border-gray-300 dark:border-gray-700 px-2 sm:px-3 md:px-4 py-2"
+        className="border border-gray-300 px-2 sm:px-3 md:px-4 py-2"
         {...props}
       >
         {children}
@@ -174,7 +174,7 @@ const MDXRenderer = ({ code }: MDXRendererProps): React.ReactElement => {
   };
 
   return (
-    <div className="mdx-content text-sm sm:text-base leading-relaxed text-foreground dark:text-foreground max-w-full overflow-x-hidden">
+    <div className="mdx-content text-sm sm:text-base leading-relaxed text-foreground max-w-full overflow-x-hidden">
       <Component components={mdxComponents} />
     </div>
   );
