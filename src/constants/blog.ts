@@ -9,4 +9,6 @@ export const FOLDER_NAME_MAPPING: Record<string, string> = {
   cs: "Computer Science",
   network: "Network",
   http: "HTTP",
+  frontend: "Frontend",
+  nextjs: "Next.js",
 };

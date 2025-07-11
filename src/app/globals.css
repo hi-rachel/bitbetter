@@ -234,11 +234,11 @@ pre code {
 
 .mdx-content th,
 .mdx-content td {
-  @apply border border-gray-300 dark:border-gray-700 px-2 sm:px-3 md:px-4 py-2;
+  @apply border border-gray-300 px-2 sm:px-3 md:px-4 py-2;
 }
 
 .mdx-content a {
-  @apply underline underline-offset-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300;
+  @apply underline underline-offset-2 text-blue-600 hover:text-blue-800;
 }
 
 .mdx-content mark {
@@ -293,18 +293,18 @@ pre code {
 
 .mdx-content th,
 .mdx-content td {
-  @apply border border-gray-300 dark:border-gray-700 px-2 sm:px-3 md:px-4 py-2 text-left;
+  @apply border border-gray-300 px-2 sm:px-3 md:px-4 py-2 text-left;
 }
 
 .mdx-content thead {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-gray-100;
 }
 
 .mdx-content tbody tr:nth-child(even) {
-  @apply bg-gray-50 dark:bg-gray-900;
+  @apply bg-gray-50;
 }
 
 .mdx-content hr,
 hr {
-  @apply my-6 sm:my-7 md:my-8 border-t border-gray-200 dark:border-gray-700;
+  @apply my-6 sm:my-7 md:my-8 border-t border-gray-200;
 }
