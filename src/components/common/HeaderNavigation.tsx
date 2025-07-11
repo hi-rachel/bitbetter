@@ -65,7 +65,7 @@ const HeaderNavigation = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
               whileHover={{ scale: 1.1, rotate: 5 }}
-              href="https://github.com/hi-rachel"
+              href="https://github.com/hi-rachel/bitbetter/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center"
