@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { allBlogs } from "contentlayer/generated";
 import { FileText } from "lucide-react";
@@ -38,20 +38,45 @@ const buildBlogTree = (posts: BlogPost[]): BlogTreeNode[] => {
   return root;
 };
 
-const BlogSidebar = () => {
+interface BlogSidebarProps {
+  selectedCategory: string | null;
+  onCategorySelect: (category: string | null) => void;
+}
+
+const BlogSidebar = ({
+  selectedCategory,
+  onCategorySelect,
+}: BlogSidebarProps) => {
   const tree = buildBlogTree(allBlogs);
+  const router = useRouter();
+
+  // 카테고리 클릭 시 라우팅
+  const handleCategorySelect = (category: string | null) => {
+    onCategorySelect(category);
+    if (category) {
+      router.push(`/blog/${category}`);
+    } else {
+      router.push(`/blog`);
+    }
+  };
 
   return (
     <nav className="space-y-4 text-sm font-medium">
-      <Link
-        href="/blog"
-        className="text-gray-700 hover:text-indigo-600 block flex items-center gap-2"
+      <button
+        onClick={() => handleCategorySelect(null)}
+        className="text-gray-700 hover:text-indigo-600 flex items-center gap-2 w-full text-left"
+        type="button"
       >
         <FileText size={16} />
         전체 글 보기
-      </Link>
+        <span className="ml-1 text-xs text-gray-400">({allBlogs.length})</span>
+      </button>
       <div className="mt-4">
-        <BlogTree nodes={tree} />
+        <BlogTree
+          nodes={tree}
+          selectedCategory={selectedCategory}
+          onCategorySelect={handleCategorySelect}
+        />
       </div>
     </nav>
   );

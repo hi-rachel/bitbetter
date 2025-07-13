@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { allBlogs, Blog } from "contentlayer/generated";
@@ -14,19 +14,33 @@ const getAllTags = (posts: Blog[]): string[] => {
   return Array.from(tagSet);
 };
 
-const BlogPage = () => {
+interface BlogPageProps {
+  selectedCategory?: string | null;
+}
+
+const BlogPage = ({ selectedCategory }: BlogPageProps) => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+
+  // 카테고리 변경 시 태그 필터 초기화
+  useEffect(() => {
+    setSelectedTag(null);
+  }, [selectedCategory]);
 
   // 날짜순으로 블로그 정렬 (최신순)
   const sortedBlogs: Blog[] = allBlogs.sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
-  const allTags: string[] = getAllTags(allBlogs as Blog[]);
-  const filteredBlogs: Blog[] = selectedTag
-    ? sortedBlogs.filter((post) => post.tags?.includes(selectedTag))
+  // 카테고리 필터링 추가
+  const categoryFilteredBlogs: Blog[] = selectedCategory
+    ? sortedBlogs.filter((post) => post.slug.startsWith(selectedCategory))
     : sortedBlogs;
+
+  const allTags: string[] = getAllTags(categoryFilteredBlogs as Blog[]);
+  const filteredBlogs: Blog[] = selectedTag
+    ? categoryFilteredBlogs.filter((post) => post.tags?.includes(selectedTag))
+    : categoryFilteredBlogs;
 
   const handleTagClick = (tag: string): void => {
     setSelectedTag(selectedTag === tag ? null : tag);
