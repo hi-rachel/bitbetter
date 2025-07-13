@@ -14,33 +14,19 @@ const getAllTags = (posts: Blog[]): string[] => {
   return Array.from(tagSet);
 };
 
-interface BlogPageProps {
-  selectedCategory?: string | null;
-}
-
-const BlogPage = ({ selectedCategory }: BlogPageProps) => {
+const BlogPage = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
-
-  // 카테고리 변경 시 태그 필터 초기화
-  useEffect(() => {
-    setSelectedTag(null);
-  }, [selectedCategory]);
 
   // 날짜순으로 블로그 정렬 (최신순)
   const sortedBlogs: Blog[] = allBlogs.sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
-  // 카테고리 필터링 추가
-  const categoryFilteredBlogs: Blog[] = selectedCategory
-    ? sortedBlogs.filter((post) => post.slug.startsWith(selectedCategory))
-    : sortedBlogs;
-
-  const allTags: string[] = getAllTags(categoryFilteredBlogs as Blog[]);
+  const allTags: string[] = getAllTags(sortedBlogs as Blog[]);
   const filteredBlogs: Blog[] = selectedTag
-    ? categoryFilteredBlogs.filter((post) => post.tags?.includes(selectedTag))
-    : categoryFilteredBlogs;
+    ? sortedBlogs.filter((post) => post.tags?.includes(selectedTag))
+    : sortedBlogs;
 
   const handleTagClick = (tag: string): void => {
     setSelectedTag(selectedTag === tag ? null : tag);
