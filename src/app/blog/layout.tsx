@@ -38,11 +38,7 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
       <main className="flex-1 min-w-0 px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-10">
         <div className="max-w-4xl mx-auto w-full">
           {/* 블로그 메인 페이지면 BlogPage에 props로 직접 렌더링, 상세/기타 페이지면 children 그대로 */}
-          {!isDetailPage ? (
-            <BlogPage selectedCategory={selectedCategory} />
-          ) : (
-            children
-          )}
+          {!isDetailPage ? <BlogPage /> : children}
         </div>
       </main>
 
