@@ -1,0 +1,167 @@
+---
+title: "Python nonlocal, local, global"
+date: "2025-07-13"
+description: "Python의 nonlocal, local, global 개념과 활용, LEGB 규칙"
+tags: ["Python", "nonlocal"]
+---
+
+# 파이썬 nonlocal
+
+파이썬에서 **nonlocal** 키워드는 중첩 함수(내부 함수)에서 바깥 함수의 지역 변수에 접근하고 수정할 때 사용합니다.
+알고리즘 문제 풀이, 클로저, 함수형 프로그래밍, 상태 유지 등에 자주 등장합니다.
+
+## 1. nonlocal의 의미와 동작 원리
+
+- **nonlocal**: 현재 함수의 지역 범위가 아닌, 바로 바깥(상위) 함수의 지역 변수에 접근/수정할 때 사용
+- **global**: 전역 변수에 접근/수정할 때 사용
+- **local**: 현재 함수 내부에서만 유효한 변수
+
+### 예제: nonlocal 없이 동작
+
+```python
+def outer():
+    x = 10
+    def inner():
+        x = 20  # 새로운 지역 변수 x 생성 (outer의 x와 별개)
+        print(x)
+    inner()
+    print(x)
+
+outer()
+# 출력: 20, 10
+```
+
+### 예제: nonlocal 사용
+
+```python
+def outer():
+    x = 10
+    def inner():
+        nonlocal x  # outer의 x를 참조
+        x = 20      # outer의 x 값 변경
+        print(x)
+    inner()
+    print(x)
+
+outer()
+# 출력: 20, 20
+```
+
+## 2. 관련 개념: LEGB 규칙
+
+파이썬의 변수 탐색 순서(LEGB):
+
+<table>
+  <thead>
+    <tr>
+      <th>범위</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Local</td>
+      <td>현재 함수 내부</td>
+    </tr>
+    <tr>
+      <td>Enclosing</td>
+      <td>바로 바깥(상위) 함수의 지역</td>
+    </tr>
+    <tr>
+      <td>Global</td>
+      <td>모듈 전체(전역)</td>
+    </tr>
+    <tr>
+      <td>Built-in</td>
+      <td>파이썬 내장</td>
+    </tr>
+  </tbody>
+</table>
+
+- **nonlocal**은 Enclosing 범위의 변수를 수정할 때 필요
+- **global**은 Global 범위의 변수를 수정할 때 필요
+
+## 3. 코딩테스트에서 nonlocal이 필요한 상황
+
+- **클로저(closure) 패턴**: 내부 함수가 바깥 함수의 상태를 기억/수정해야 할 때
+- **DFS/BFS, 백트래킹 등 재귀 함수에서 상태 유지**
+- **함수형 프로그래밍, 람다, 데코레이터 구현 등**
+
+### 예제: 카운터 함수 만들기 (클로저)
+
+```python
+def make_counter():
+    count = 0
+    def counter():
+        nonlocal count
+        count += 1
+        return count
+    return counter
+
+c = make_counter()
+print(c())  # 1
+print(c())  # 2
+```
+
+### 예제: DFS에서 상태 공유
+
+```python
+def dfs():
+    answer = 0
+    def go():
+        nonlocal answer
+        # ... 탐색 로직 ...
+        answer += 1
+    go()
+    return answer
+```
+
+## 4. global과의 차이
+
+- **nonlocal**: 바깥(상위) 함수의 지역 변수만 수정 (전역 변수 X)
+- **global**: 모듈 전체의 전역 변수 수정
+
+```python
+global_var = 0
+def func():
+    global global_var
+    global_var = 10
+```
+
+## 5. 실전 팁 & 주의사항
+
+- nonlocal은 반드시 중첩 함수(내부 함수)에서만 사용 가능
+- 바깥 함수에 해당 변수 선언이 반드시 있어야 함 (없으면 에러)
+- 전역 변수 수정은 global, 바깥 함수 변수 수정은 nonlocal
+- 코테에서 상태를 함수 내부에 은닉하고 싶을 때 유용
+
+## 6. 요약 표
+
+<table>
+  <thead>
+    <tr>
+      <th>키워드</th>
+      <th>수정 대상</th>
+      <th>사용 위치</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>local</td>
+      <td>현재 함수</td>
+      <td>함수 내부</td>
+    </tr>
+    <tr>
+      <td>nonlocal</td>
+      <td>바로 바깥 함수</td>
+      <td>중첩 함수 내부</td>
+    </tr>
+    <tr>
+      <td>global</td>
+      <td>전역(모듈)</td>
+      <td>함수 내부</td>
+    </tr>
+  </tbody>
+</table>
+
+---
