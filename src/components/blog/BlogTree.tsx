@@ -45,7 +45,7 @@ const BlogTree: React.FC<BlogTreeProps> = ({
   };
 
   return (
-    <ul style={{ paddingLeft: depth * 10 }}>
+    <ul>
       {nodes.map((node) => {
         // currentPath를 항상 소문자+trim으로 생성
         const currentPath = (
@@ -53,17 +53,14 @@ const BlogTree: React.FC<BlogTreeProps> = ({
         )
           .toLowerCase()
           .trim();
+        const liClass = depth > 0 ? "border-l border-gray-200" : "";
         if (node.post && !node.children) {
           // 파일(포스트)
           return (
-            <li key={currentPath} style={{ paddingLeft: depth * 1 }}>
+            <li key={currentPath} className={liClass}>
               <Link
                 href={`/blog/${node.post.slug}`}
-                className={`block text-gray-600 hover:text-indigo-500 truncate py-1 transition-colors${
-                  depth > 0
-                    ? " border-l border-gray-200 hover:border-indigo-300 pl-4"
-                    : ""
-                }`}
+                className={`block text-gray-600 hover:text-indigo-500 truncate py-1 transition-colors pl-6`}
                 title={node.post.title}
               >
                 {node.post.title}
@@ -80,13 +77,17 @@ const BlogTree: React.FC<BlogTreeProps> = ({
         const folderTextClass =
           depth === 0 ? "text-base font-extrabold" : "font-bold";
         return (
-          <li key={currentPath} style={{ paddingLeft: depth * 16 }}>
+          <li
+            key={currentPath}
+            style={{ paddingLeft: depth > 0 ? 10 : 0 }}
+            className={depth > 0 ? "border-l border-gray-200" : ""}
+          >
             <div className="flex items-center w-full">
               {/* 화살표 아이콘: 열고 닫기만 */}
               <button
                 type="button"
                 onClick={() => toggleFolder(currentPath)}
-                className="flex items-center justify-center px-1 focus:outline-none"
+                className="flex items-center justify-center focus:outline-none"
                 tabIndex={-1}
                 aria-label={
                   openFolders[currentPath] !== false ? "폴더 닫기" : "폴더 열기"
@@ -98,11 +99,11 @@ const BlogTree: React.FC<BlogTreeProps> = ({
                   <ChevronRight size={14} />
                 )}
               </button>
-              {/* 폴더 아이콘+이름: 카테고리 선택만 (border-l 제거) */}
+              {/* 폴더 아이콘+이름: 카테고리 선택만 */}
               <button
                 type="button"
                 onClick={() => selectCategory(currentPath)}
-                className={`flex items-center gap-2 flex-1 text-left py-1 transition-colors ${
+                className={`flex items-center gap-2 flex-1 text-left py-1 transition-colors pl-2 ${
                   isSelected
                     ? "text-indigo-600 font-bold"
                     : "text-gray-700 hover:text-indigo-600"
