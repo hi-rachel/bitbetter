@@ -10,6 +10,11 @@ import type { BlogPost } from "@/types/blog/post";
 
 import BlogTree from "./BlogTree";
 
+interface BlogSidebarProps {
+  selectedCategory: string | null;
+  onCategorySelect: (category: string | null) => void;
+}
+
 // slug 배열로 트리 구조 생성
 const buildBlogTree = (posts: BlogPost[]): BlogTreeNode[] => {
   const root: BlogTreeNode[] = [];
@@ -35,13 +40,17 @@ const buildBlogTree = (posts: BlogPost[]): BlogTreeNode[] => {
     });
   });
 
+  // 트리 정렬 함수 (알파벳 순)
+  const sortNodes = (nodes: BlogTreeNode[]): void => {
+    nodes.sort((a, b) => a.name.localeCompare(b.name, "en"));
+    nodes.forEach((node) => {
+      if (node.children) sortNodes(node.children);
+    });
+  };
+
+  sortNodes(root);
   return root;
 };
-
-interface BlogSidebarProps {
-  selectedCategory: string | null;
-  onCategorySelect: (category: string | null) => void;
-}
 
 const BlogSidebar = ({
   selectedCategory,
