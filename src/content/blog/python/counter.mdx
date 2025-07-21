@@ -79,6 +79,15 @@ print(c)  # Counter({'l': 3, 'o': 2, 'h': 1, 'e': 1, ' ': 1, 'w': 1, 'r': 1, 'd'
     </tr>
     <tr>
       <td>
+        <code>get(key[, default])</code>
+      </td>
+      <td>
+        key의 개수 반환. 없으면 default 반환 (기본값 None, KeyError 발생하지
+        않음)
+      </td>
+    </tr>
+    <tr>
+      <td>
         <code>+ - & |</code>
       </td>
       <td>Counter 간 합집합, 교집합, 차집합, 합산 연산 지원</td>
@@ -113,6 +122,11 @@ print(c)  # Counter({'c': 4, 'b': 2, 'a': 1})
 # c[key]
 print(c['b'])  # 2
 print(c['z'])  # 0 (없는 키는 0 반환)
+
+# get(key[, default])
+print(c.get('b'))     # 2
+print(c.get('z'))     # None (없는 키는 None 반환)
+print(c.get('z', -1)) # -1 (기본값 지정 가능)
 
 # + - & | 연산
 c3 = Counter("aabbcc")
