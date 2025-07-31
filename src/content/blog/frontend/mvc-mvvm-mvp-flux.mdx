@@ -1,0 +1,1031 @@
+---
+title: "프론트엔드 개발자가 알아야 하는 디자인 패턴: MVC, MVVM, MVP, Flux"
+description: "프론트엔드 개발에서 중요한 아키텍처 패턴들을 이해하고 React와의 연결점을 알아보자"
+date: "2025-07-31"
+tags: ["design-pattern", "react"]
+---
+
+프론트엔드 개발을 하다 보면 **아키텍처 패턴**이라는 용어를 자주 접하게 됩니다. 특히 MVC, MVVM, MVP는 프론트엔드 개발에서 가장 중요한 디자인 패턴들입니다. 이 글에서는 각 패턴의 특징과 장단점을 살펴보고, 실제 React 개발에서 어떻게 적용되는지 알아보겠습니다.
+
+## 디자인 패턴이란?
+
+디자인 패턴은 소프트웨어 개발에서 자주 발생하는 문제들을 해결하기 위한 재사용 가능한 솔루션입니다. 프론트엔드 개발에서는 **관심사의 분리(Separation of Concerns)** 를 통해 코드의 유지보수성과 확장성을 높이는 것이 핵심입니다.
+
+## 1. MVC (Model-View-Controller)
+
+### MVC 패턴의 구조
+
+<div className="text-center my-8">
+  <div className="inline-block border-2 border-blue-500 rounded-lg p-4 bg-slate-50">
+    <div className="font-bold text-blue-700 mb-2">MVC Architecture</div>
+    <div className="grid grid-cols-3 gap-4 mt-4">
+      <div className="border border-gray-200 p-2 rounded bg-amber-100">
+        <strong>Model</strong>
+        <br />
+        <small>데이터 & 비즈니스 로직</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-blue-100">
+        <strong>View</strong>
+        <br />
+        <small>UI 표현</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-green-100">
+        <strong>Controller</strong>
+        <br />
+        <small>사용자 입력 처리</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div align="center">
+  <img
+    width="250"
+    height="275"
+    alt="Image"
+    src="https://github.com/user-attachments/assets/ed087ae3-8a39-4721-84d9-bcd27ecb5fbc"
+  />
+</div>
+
+컨트롤러가 입력을 받고, 모델에서 데이터를 조회해서 받은 다음에 응답 View 생성.
+
+### MVC의 각 구성 요소
+
+#### Model (모델)
+
+- **역할**: 데이터와 비즈니스 로직을 담당
+- **책임**: 데이터 검증, 저장, 조회, 비즈니스 규칙 적용
+- **특징**: View나 Controller에 직접적인 의존성이 없음
+
+```javascript
+// Model 예시
+class UserModel {
+  constructor() {
+    this.users = [];
+  }
+
+  addUser(user) {
+    if (this.validateUser(user)) {
+      this.users.push(user);
+      return true;
+    }
+    return false;
+  }
+
+  validateUser(user) {
+    return user.name && user.email;
+  }
+
+  getUsers() {
+    return [...this.users];
+  }
+}
+```
+
+#### View (뷰)
+
+- **역할**: 사용자에게 데이터를 표시
+- **책임**: UI 렌더링, 사용자 인터페이스 제공
+- **특징**: Model의 데이터를 직접 참조하지만 수정하지는 않음
+
+```javascript
+// View 예시
+class UserView {
+  render(users) {
+    const userList = users
+      .map(
+        (user) => `<div class="user-item">${user.name} - ${user.email}</div>`
+      )
+      .join("");
+
+    document.getElementById("user-list").innerHTML = userList;
+  }
+}
+```
+
+#### Controller (컨트롤러)
+
+- **역할**: 사용자 입력을 처리하고 Model과 View를 조정
+- **책임**: 이벤트 처리, Model 업데이트, View 갱신
+- **특징**: Model과 View 사이의 중재자 역할
+
+```javascript
+// Controller 예시
+class UserController {
+  constructor(model, view) {
+    this.model = model;
+    this.view = view;
+  }
+
+  addUser(name, email) {
+    const user = { name, email };
+    if (this.model.addUser(user)) {
+      this.view.render(this.model.getUsers());
+    }
+  }
+
+  loadUsers() {
+    this.view.render(this.model.getUsers());
+  }
+}
+```
+
+### MVC의 장단점
+
+**장점:**
+
+- 명확한 관심사 분리
+- 코드 재사용성 높음
+- 테스트하기 쉬운 구조
+- 확장성이 좋음
+
+**단점:**
+
+- 복잡한 애플리케이션에서는 Controller가 비대해질 수 있음
+- View와 Model 간의 결합도가 높을 수 있음
+
+## 2. MVVM (Model-View-ViewModel)
+
+### MVVM 패턴의 구조
+
+<div className="text-center my-8">
+  <div className="inline-block border-2 border-purple-500 rounded-lg p-4 bg-slate-50">
+    <div className="font-bold text-purple-700 mb-2">MVVM Architecture</div>
+    <div className="grid grid-cols-3 gap-4 mt-4">
+      <div className="border border-gray-200 p-2 rounded bg-blue-100">
+        <strong>View</strong>
+        <br />
+        <small>UI 표현</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-pink-100">
+        <strong>ViewModel</strong>
+        <br />
+        <small>View 상태 & 명령</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-amber-100">
+        <strong>Model</strong>
+        <br />
+        <small>데이터 & 비즈니스 로직</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div align="center">
+  <img
+    width="500"
+    height="151"
+    alt="MVVM Architecture"
+    src="https://github.com/user-attachments/assets/4ca0ce41-8cc5-47e6-92ea-5a384cdad6af"
+  />
+</div>
+
+### MVVM의 각 구성 요소
+
+#### Model (모델)
+
+- MVC와 동일한 역할
+- 데이터와 비즈니스 로직을 담당
+
+#### ViewModel (뷰모델)
+
+- **역할**: View를 위한 데이터와 명령을 제공
+- **책임**: Model 데이터를 View에 맞게 변환, View 상태 관리
+- **특징**: View에 대한 추상화 제공
+
+```javascript
+// ViewModel 예시
+class UserViewModel {
+  constructor(userService) {
+    this.userService = userService;
+    this.users = [];
+    this.isLoading = false;
+    this.error = null;
+  }
+
+  async loadUsers() {
+    this.isLoading = true;
+    this.error = null;
+
+    try {
+      const users = await this.userService.getUsers();
+      this.users = users.map((user) => ({
+        displayName: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        isActive: user.status === "active",
+      }));
+    } catch (error) {
+      this.error = error.message;
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  addUser(firstName, lastName, email) {
+    const user = { firstName, lastName, email, status: "active" };
+    return this.userService.createUser(user);
+  }
+}
+```
+
+#### View (뷰)
+
+- **역할**: UI 표시와 사용자 상호작용
+- **책임**: ViewModel의 데이터를 바인딩하여 표시
+- **특징**: 최소한의 로직만 포함
+
+```javascript
+// View 예시 (Vue.js 스타일)
+const UserView = {
+  template: `
+    <div>
+      <div v-if="isLoading">Loading...</div>
+      <div v-else-if="error">{{ error }}</div>
+      <div v-else>
+        <div v-for="user in users" :key="user.email">
+          <span :class="{ active: user.isActive }">{{ user.displayName }}</span>
+          <span>{{ user.email }}</span>
+        </div>
+      </div>
+    </div>
+  `,
+  data() {
+    return {
+      viewModel: new UserViewModel(userService),
+    };
+  },
+  computed: {
+    users() {
+      return this.viewModel.users;
+    },
+    isLoading() {
+      return this.viewModel.isLoading;
+    },
+    error() {
+      return this.viewModel.error;
+    },
+  },
+  mounted() {
+    this.viewModel.loadUsers();
+  },
+};
+```
+
+### MVVM의 장단점
+
+**장점:**
+
+- **양방향 데이터 바인딩으로 자동 UI 업데이트**
+- View와 Model 간의 완전한 분리
+- 테스트하기 쉬운 ViewModel
+- 재사용 가능한 ViewModel
+
+**단점:**
+
+- 복잡한 데이터 바인딩으로 디버깅이 어려울 수 있음
+- 메모리 사용량이 높을 수 있음
+- 학습 곡선이 있음
+
+## 3. MVP (Model-View-Presenter)
+
+### MVP 패턴의 구조
+
+<div className="text-center my-8">
+  <div className="inline-block border-2 border-emerald-500 rounded-lg p-4 bg-slate-50">
+    <div className="font-bold text-emerald-700 mb-2">MVP Architecture</div>
+    <div className="grid grid-cols-3 gap-4 mt-4">
+      <div className="border border-gray-200 p-2 rounded bg-amber-100">
+        <strong>Model</strong>
+        <br />
+        <small>데이터 & 비즈니스 로직</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-emerald-100">
+        <strong>Presenter</strong>
+        <br />
+        <small>비즈니스 로직 & View 조정</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-blue-100">
+        <strong>View</strong>
+        <br />
+        <small>UI 표현</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div align="center">
+  <img
+    width="250"
+    height="171"
+    alt="Image"
+    src="https://github.com/user-attachments/assets/f8ee4df8-cdf1-4072-8a00-02306832a55d"
+  />
+</div>
+
+### MVP의 각 구성 요소
+
+#### Model (모델)
+
+- MVC와 동일한 역할
+- 데이터와 비즈니스 로직을 담당
+
+#### Presenter (프레젠터)
+
+- **역할**: View와 Model 사이의 중재자
+- **책임**: 비즈니스 로직 처리, View 상태 관리
+- **특징**: **View에 대한 참조를 가지고 직접 제어**
+
+```javascript
+// Presenter 예시
+class UserPresenter {
+  constructor(model, view) {
+    this.model = model;
+    this.view = view;
+    this.view.setPresenter(this);
+  }
+
+  onViewReady() {
+    this.loadUsers();
+  }
+
+  async loadUsers() {
+    this.view.showLoading();
+
+    try {
+      const users = await this.model.getUsers();
+      this.view.displayUsers(users);
+    } catch (error) {
+      this.view.showError(error.message);
+    } finally {
+      this.view.hideLoading();
+    }
+  }
+
+  async addUser(userData) {
+    try {
+      await this.model.addUser(userData);
+      this.loadUsers(); // 목록 새로고침
+    } catch (error) {
+      this.view.showError(error.message);
+    }
+  }
+}
+```
+
+#### View (뷰)
+
+- **역할**: UI 표시와 사용자 입력 전달
+- **책임**: Presenter에 이벤트 전달, UI 상태 변경
+- **특징**: Passive View - 최소한의 로직만 포함
+
+```javascript
+// View 예시
+class UserView {
+  constructor() {
+    this.presenter = null;
+    this.bindEvents();
+  }
+
+  setPresenter(presenter) {
+    this.presenter = presenter;
+  }
+
+  bindEvents() {
+    document.getElementById("add-user-btn").addEventListener("click", () => {
+      const name = document.getElementById("user-name").value;
+      const email = document.getElementById("user-email").value;
+      this.presenter.addUser({ name, email });
+    });
+  }
+
+  showLoading() {
+    document.getElementById("loading").style.display = "block";
+  }
+
+  hideLoading() {
+    document.getElementById("loading").style.display = "none";
+  }
+
+  displayUsers(users) {
+    const userList = users
+      .map(
+        (user) => `<div class="user-item">${user.name} - ${user.email}</div>`
+      )
+      .join("");
+    document.getElementById("user-list").innerHTML = userList;
+  }
+
+  showError(message) {
+    document.getElementById("error").textContent = message;
+    document.getElementById("error").style.display = "block";
+  }
+}
+```
+
+### MVP의 장단점
+
+**장점:**
+
+- View와 Model의 완전한 분리
+- 테스트하기 쉬운 구조
+- Presenter의 재사용 가능
+- Passive View로 UI 로직 최소화
+
+**단점:**
+
+- Presenter가 비대해질 수 있음
+- View 인터페이스가 복잡해질 수 있음
+- 작은 프로젝트에서는 과도한 복잡성
+
+## 4. Flux (단방향 데이터 흐름)
+
+### Flux 패턴의 구조
+
+<div className="text-center my-8">
+  <div className="inline-block border-2 border-orange-500 rounded-lg p-4 bg-slate-50">
+    <div className="font-bold text-orange-700 mb-2">Flux Architecture</div>
+    <div className="grid grid-cols-4 gap-4 mt-4">
+      <div className="border border-gray-200 p-2 rounded bg-orange-100">
+        <strong>Action</strong>
+        <br />
+        <small>사용자 상호작용</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-blue-100">
+        <strong>Dispatcher</strong>
+        <br />
+        <small>중앙 이벤트 버스</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-green-100">
+        <strong>Store</strong>
+        <br />
+        <small>상태 관리</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-purple-100">
+        <strong>View</strong>
+        <br />
+        <small>UI 렌더링</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div align="center">
+  <img
+    width="1280"
+    height="386"
+    alt="Image"
+    src="https://github.com/user-attachments/assets/22a20614-f86b-4978-aad8-9d78842737f2"
+  />
+</div>
+
+### Flux의 각 구성 요소
+
+#### Action (액션)
+
+- **역할**: 사용자 상호작용을 나타내는 객체
+- **책임**: 어떤 작업이 수행될지 정의, 데이터 페이로드 포함
+- **특징**: 모든 상태 변경은 Action을 통해 시작
+
+```javascript
+// Action 예시
+const UserActions = {
+  ADD_USER: "ADD_USER",
+  DELETE_USER: "DELETE_USER",
+  UPDATE_USER: "UPDATE_USER",
+  LOAD_USERS: "LOAD_USERS",
+};
+
+// Action Creator
+const addUser = (userData) => ({
+  type: UserActions.ADD_USER,
+  payload: userData,
+});
+
+const deleteUser = (userId) => ({
+  type: UserActions.DELETE_USER,
+  payload: { id: userId },
+});
+```
+
+#### Dispatcher (디스패처)
+
+- **역할**: 모든 Action을 중앙에서 관리하는 이벤트 버스
+- **책임**: Action을 Store에 전달, 등록된 콜백 실행
+- **특징**: 단일 인스턴스로 모든 데이터 흐름을 제어
+
+```javascript
+// Dispatcher 예시
+class Dispatcher {
+  constructor() {
+    this.callbacks = [];
+  }
+
+  register(callback) {
+    this.callbacks.push(callback);
+    return this.callbacks.length - 1; // ID 반환
+  }
+
+  dispatch(action) {
+    this.callbacks.forEach((callback) => {
+      callback(action);
+    });
+  }
+}
+
+const dispatcher = new Dispatcher();
+```
+
+#### Store (스토어)
+
+- **역할**: 애플리케이션의 상태를 관리
+- **책임**: 데이터 저장, 비즈니스 로직 처리, 상태 변경 알림
+- **특징**: Dispatcher에 등록되어 Action을 처리
+
+```javascript
+// Store 예시
+class UserStore {
+  constructor() {
+    this.users = [];
+    this.loading = false;
+    this.error = null;
+
+    // Dispatcher에 등록
+    dispatcher.register(this.handleAction.bind(this));
+  }
+
+  handleAction(action) {
+    switch (action.type) {
+      case UserActions.ADD_USER:
+        this.addUser(action.payload);
+        break;
+      case UserActions.DELETE_USER:
+        this.deleteUser(action.payload.id);
+        break;
+      case UserActions.LOAD_USERS:
+        this.loadUsers();
+        break;
+    }
+  }
+
+  addUser(userData) {
+    this.users.push(userData);
+    this.emitChange();
+  }
+
+  deleteUser(userId) {
+    this.users = this.users.filter((user) => user.id !== userId);
+    this.emitChange();
+  }
+
+  getUsers() {
+    return this.users;
+  }
+
+  emitChange() {
+    // View에 변경 알림
+    if (this.onChange) {
+      this.onChange();
+    }
+  }
+}
+```
+
+#### View (뷰)
+
+- **역할**: UI 렌더링과 사용자 상호작용 처리
+- **책임**: Store의 데이터를 표시, 사용자 입력을 Action으로 변환
+- **특징**: Store의 변경사항을 구독하여 자동 업데이트
+
+```javascript
+// View 예시
+class UserView {
+  constructor(store) {
+    this.store = store;
+    this.store.onChange = this.render.bind(this);
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    document.getElementById("add-user-btn").addEventListener("click", () => {
+      const name = document.getElementById("user-name").value;
+      const email = document.getElementById("user-email").value;
+
+      // Action 생성 및 디스패치
+      const action = addUser({ name, email });
+      dispatcher.dispatch(action);
+    });
+  }
+
+  render() {
+    const users = this.store.getUsers();
+    const userList = users
+      .map(
+        (user) => `<div class="user-item">${user.name} - ${user.email}</div>`
+      )
+      .join("");
+
+    document.getElementById("user-list").innerHTML = userList;
+  }
+}
+```
+
+### Flux의 장단점
+
+**장점:**
+
+- 예측 가능한 단방향 데이터 흐름
+- 디버깅이 쉬움 (모든 상태 변경이 Action을 통해)
+- 상태 관리의 중앙화
+- 테스트하기 쉬운 구조
+
+**단점:**
+
+- 보일러플레이트 코드가 많음
+- 작은 프로젝트에서는 과도한 복잡성
+- 학습 곡선이 있음
+- Action과 Store 간의 의존성 관리 복잡
+
+## 패턴 비교
+
+<div className="my-8">
+  <table className="w-full border-collapse border border-gray-200">
+    <thead>
+      <tr className="bg-gray-50">
+        <th className="border border-gray-200 p-3 text-left">패턴</th>
+        <th className="border border-gray-200 p-3 text-left">장점</th>
+        <th className="border border-gray-200 p-3 text-left">단점</th>
+        <th className="border border-gray-200 p-3 text-left">적합한 상황</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td className="border border-gray-200 p-3">
+          <strong>MVC</strong>
+        </td>
+        <td className="border border-gray-200 p-3">
+          명확한 분리, 재사용성, 확장성
+        </td>
+        <td className="border border-gray-200 p-3">
+          Controller 비대화, View-Model 결합
+        </td>
+        <td className="border border-gray-200 p-3">중간 규모 애플리케이션</td>
+      </tr>
+      <tr className="bg-gray-50">
+        <td className="border border-gray-200 p-3">
+          <strong>MVVM</strong>
+        </td>
+        <td className="border border-gray-200 p-3">
+          자동 UI 업데이트, 완전한 분리
+        </td>
+        <td className="border border-gray-200 p-3">
+          복잡한 바인딩, 메모리 사용량
+        </td>
+        <td className="border border-gray-200 p-3">데이터 중심 애플리케이션</td>
+      </tr>
+      <tr>
+        <td className="border border-gray-200 p-3">
+          <strong>MVP</strong>
+        </td>
+        <td className="border border-gray-200 p-3">
+          완전한 분리, 테스트 용이성
+        </td>
+        <td className="border border-gray-200 p-3">
+          Presenter 비대화, 복잡한 인터페이스
+        </td>
+        <td className="border border-gray-200 p-3">테스트 중심 개발</td>
+      </tr>
+      <tr className="bg-gray-50">
+        <td className="border border-gray-200 p-3">
+          <strong>Flux</strong>
+        </td>
+        <td className="border border-gray-200 p-3">
+          예측 가능한 데이터 흐름, 디버깅 용이성
+        </td>
+        <td className="border border-gray-200 p-3">
+          보일러플레이트 코드, 복잡성
+        </td>
+        <td className="border border-gray-200 p-3">
+          대규모 복잡한 애플리케이션
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## React와의 연결점
+
+### React는 어떤 패턴을 사용할까?
+
+React는 **선언적 UI 라이브러리**로, 특정 패턴을 강제하지 않습니다. 하지만 일반적으로 다음과 같은 패턴들이 사용됩니다:
+
+#### 1. MVC 스타일 (전통적인 React)
+
+```javascript
+// Model (상태 관리)
+const [users, setUsers] = useState([]);
+const [loading, setLoading] = useState(false);
+
+// Controller (이벤트 핸들러)
+const handleAddUser = (userData) => {
+  setLoading(true);
+  userService
+    .createUser(userData)
+    .then(() => loadUsers())
+    .finally(() => setLoading(false));
+};
+
+// View (JSX)
+return (
+  <div>
+    {loading && <div>Loading...</div>}
+    {users.map((user) => (
+      <UserCard key={user.id} user={user} />
+    ))}
+  </div>
+);
+```
+
+#### 2. MVVM 스타일 (React + 상태 관리)
+
+```javascript
+// ViewModel (Custom Hook)
+const useUserViewModel = () => {
+  const [state, setState] = useState({
+    users: [],
+    loading: false,
+    error: null,
+  });
+
+  const loadUsers = async () => {
+    setState((prev) => ({ ...prev, loading: true }));
+    try {
+      const users = await userService.getUsers();
+      setState((prev) => ({ ...prev, users, loading: false }));
+    } catch (error) {
+      setState((prev) => ({ ...prev, error: error.message, loading: false }));
+    }
+  };
+
+  return { ...state, loadUsers };
+};
+
+// View (자동 바인딩)
+const UserList = () => {
+  const { users, loading, error, loadUsers } = useUserViewModel();
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  return (
+    <div>
+      {loading && <div>Loading...</div>}
+      {error && <div>Error: {error}</div>}
+      {users.map((user) => (
+        <UserCard key={user.id} user={user} />
+      ))}
+    </div>
+  );
+};
+```
+
+#### 3. MVP 스타일 (React + Presenter 패턴)
+
+```javascript
+// Presenter
+class UserPresenter {
+  constructor(view) {
+    this.view = view;
+  }
+
+  async loadUsers() {
+    this.view.setLoading(true);
+    try {
+      const users = await userService.getUsers();
+      this.view.setUsers(users);
+    } catch (error) {
+      this.view.setError(error.message);
+    } finally {
+      this.view.setLoading(false);
+    }
+  }
+}
+
+// View (Passive)
+const UserList = () => {
+  const [state, setState] = useState({
+    users: [],
+    loading: false,
+    error: null,
+  });
+
+  const presenter = useMemo(
+    () =>
+      new UserPresenter({
+        setUsers: (users) => setState((prev) => ({ ...prev, users })),
+        setLoading: (loading) => setState((prev) => ({ ...prev, loading })),
+        setError: (error) => setState((prev) => ({ ...prev, error })),
+      }),
+    []
+  );
+
+  useEffect(() => {
+    presenter.loadUsers();
+  }, []);
+
+  return (
+    <div>
+      {state.loading && <div>Loading...</div>}
+      {state.error && <div>Error: {state.error}</div>}
+      {state.users.map((user) => (
+        <UserCard key={user.id} user={user} />
+      ))}
+    </div>
+  );
+};
+```
+
+#### 4. Flux 스타일 (React + Redux/Context)
+
+```javascript
+// Action Types
+const USER_ACTIONS = {
+  ADD_USER: "ADD_USER",
+  DELETE_USER: "DELETE_USER",
+  LOAD_USERS: "LOAD_USERS",
+  SET_LOADING: "SET_LOADING",
+};
+
+// Action Creators
+const addUser = (userData) => ({
+  type: USER_ACTIONS.ADD_USER,
+  payload: userData,
+});
+
+const deleteUser = (userId) => ({
+  type: USER_ACTIONS.DELETE_USER,
+  payload: userId,
+});
+
+// Store (Reducer)
+const userReducer = (state = { users: [], loading: false }, action) => {
+  switch (action.type) {
+    case USER_ACTIONS.ADD_USER:
+      return {
+        ...state,
+        users: [...state.users, action.payload],
+      };
+    case USER_ACTIONS.DELETE_USER:
+      return {
+        ...state,
+        users: state.users.filter((user) => user.id !== action.payload),
+      };
+    case USER_ACTIONS.LOAD_USERS:
+      return {
+        ...state,
+        users: action.payload,
+      };
+    case USER_ACTIONS.SET_LOADING:
+      return {
+        ...state,
+        loading: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+
+// View (Component)
+const UserList = () => {
+  const { users, loading } = useSelector((state) => state.users);
+  const dispatch = useDispatch();
+
+  const handleAddUser = (userData) => {
+    dispatch(addUser(userData));
+  };
+
+  const handleDeleteUser = (userId) => {
+    dispatch(deleteUser(userId));
+  };
+
+  return (
+    <div>
+      {loading && <div>Loading...</div>}
+      {users.map((user) => (
+        <UserCard
+          key={user.id}
+          user={user}
+          onDelete={() => handleDeleteUser(user.id)}
+        />
+      ))}
+    </div>
+  );
+};
+```
+
+## 실제 프로젝트에서의 선택 기준
+
+### MVC를 선택하는 경우
+
+- **상황**: 중간 규모의 애플리케이션
+- **예시**: 관리자 대시보드, CMS
+- **이유**: 명확한 구조와 확장성
+
+### MVVM을 선택하는 경우
+
+- **상황**: 데이터 중심의 복잡한 UI
+- **예시**: 데이터 시각화 도구, 실시간 채팅
+- **이유**: 자동 UI 업데이트와 반응성
+
+### MVP를 선택하는 경우
+
+- **상황**: 테스트 중심 개발이 중요한 프로젝트
+- **예시**: 엔터프라이즈 애플리케이션
+- **이유**: 완전한 분리와 테스트 용이성
+
+### Flux를 선택하는 경우
+
+- **상황**: 대규모 복잡한 애플리케이션
+- **예시**: SPA, 실시간 협업 도구, 복잡한 대시보드
+- **이유**: 예측 가능한 데이터 흐름과 디버깅 용이성
+
+## 결론
+
+프론트엔드 개발에서 디자인 패턴은 **코드의 구조와 유지보수성**을 결정하는 중요한 요소입니다. MVC, MVVM, MVP, Flux 각 패턴은 고유한 장단점을 가지고 있으며, 프로젝트의 요구사항과 팀의 상황에 맞게 선택해야 합니다.
+
+React 개발에서는 특정 패턴을 강제하지 않기 때문에, 팀의 경험과 프로젝트의 복잡도에 따라 적절한 패턴을 선택하거나 여러 패턴을 조합하여 사용할 수 있습니다. 특히 Flux 패턴은 Redux, Zustand, Context API 등 다양한 상태 관리 라이브러리로 구현되어 React 생태계에서 널리 사용됩니다.
+
+가장 중요한 것은 **일관성**과 **팀의 이해도**입니다. 선택한 패턴을 팀 전체가 이해하고 일관되게 적용하는 것이 성공적인 프로젝트의 핵심입니다.
+
+---
+
+## 면접 질문 대비: 디자인 패턴 요약 답변
+
+### Q: MVC, MVVM, MVP, Flux 패턴을 간단히 설명해주세요.
+
+**A: 각 패턴의 핵심 특징을 다음과 같이 요약할 수 있습니다:**
+
+#### MVC (Model-View-Controller)
+
+- **구조**: Model(데이터) ↔ Controller(중재자) ↔ View(UI)
+- **특징**: Controller가 Model과 View를 연결하는 중재자 역할
+- **장점**: 명확한 분리, 재사용성, 확장성
+- **단점**: Controller 비대화, View-Model 결합 가능성
+
+#### MVVM (Model-View-ViewModel)
+
+- **구조**: Model(데이터) ↔ ViewModel(상태관리) ↔ View(UI)
+- **특징**: ViewModel이 View를 위한 데이터와 명령을 제공, 양방향 데이터 바인딩
+- **장점**: 자동 UI 업데이트, 완전한 분리
+- **단점**: 복잡한 바인딩, 메모리 사용량
+
+#### MVP (Model-View-Presenter)
+
+- **구조**: Model(데이터) ↔ Presenter(비즈니스로직) ↔ View(UI)
+- **특징**: Presenter가 View를 직접 제어하는 Passive View 패턴
+- **장점**: 완전한 분리, 테스트 용이성
+- **단점**: Presenter 비대화, 복잡한 인터페이스
+
+#### Flux (단방향 데이터 흐름)
+
+- **구조**: Action → Dispatcher → Store → View → Action
+- **특징**: 단방향 데이터 흐름으로 예측 가능한 상태 관리
+- **장점**: 예측 가능한 흐름, 디버깅 용이성
+- **단점**: 보일러플레이트 코드, 복잡성
+
+### Q: 각 패턴의 차이점과 언제 사용해야 할까요?
+
+**A: 프로젝트 규모와 복잡도에 따라 선택합니다:**
+
+- **MVC**: 중간 규모 애플리케이션 (관리자 대시보드, CMS)
+- **MVVM**: 데이터 중심 복잡한 UI (데이터 시각화, 실시간 채팅)
+- **MVP**: 테스트 중심 개발 (엔터프라이즈 애플리케이션)
+- **Flux**: 대규모 복잡한 애플리케이션 (SPA, 실시간 협업 도구)
+
+### Q: React에서는 어떤 패턴을 주로 사용하나요?
+
+**A: React는 패턴을 강제하지 않지만, 일반적으로:**
+
+- **MVC 스타일**: useState + 이벤트 핸들러
+- **MVVM 스타일**: Custom Hook + 상태 관리
+- **MVP 스타일**: Presenter 클래스 + 컴포넌트
+- **Flux 스타일**: Redux, Zustand, Context API
+
+### 핵심 포인트
+
+1. **관심사의 분리**가 모든 패턴의 핵심
+2. **프로젝트 규모와 복잡도**에 따라 선택
+3. **팀의 이해도와 일관성**이 가장 중요
+4. **패턴을 조합**하여 사용하는 것도 가능
+
+---
+
+**참고 자료:**
+
+- [React Design Patterns](https://reactpatterns.com/)
+- [Frontend Architecture Patterns](https://martinfowler.com/eaaDev/uiArchs.html)
+- [MVVM vs MVC vs MVP](https://www.codeproject.com/Articles/66585/Comparison-of-Architecture-presentation-patterns)
+- [MVC Image](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller)
+- [MVVM Image](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel)
+- [MVP Image](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter)
+- [Flux Image](https://2nnsv.tistory.com/168)
