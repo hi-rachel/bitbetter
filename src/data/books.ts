@@ -4,7 +4,7 @@ import { Book, BookCategory } from "@/types/book";
 export const categories: BookCategory[] = [
   { id: "development", name: "개발" },
   { id: "literature", name: "문학" },
-  { id: "자기계발", name: "자기계발" },
+  { id: "self-development", name: "자기계발" },
 ];
 
 // 책 데이터
@@ -17,6 +17,7 @@ export const books: Book[] = [
     publishedYear: 2015,
     category: "development",
     coverImage: "/images/books/the-software-craftsman.jpg",
+    lastUpdated: "2025-06-01",
     highlights: [
       {
         chapter: "9장. 인재 채용",
@@ -71,6 +72,39 @@ export const books: Book[] = [
             text: "p.226 시스템 주요 문제가 알고리즘이 아니라면 코딩 면접 때 알고리즘 문제 대신 실제 문제에 가까운 과제를 제시해야 한다. 지원자가 비즈니스 도메인을 표현하고 솔루션을 설계할 역량이 있는지에 집중해야 한다.",
             comments: [
               "면접관 스스로도 할 수 없는 일이나 실제 업무 현장에서 부딪히지 않을 상황을 지원자에게 요구해서는 안된다. 예) 인터넷 X, 종이나 화이트보드 코드 작성",
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "2",
+    title: "불편한 편의점",
+    author: "김호연",
+    publisher: "나무옆의자",
+    publishedYear: 2024,
+    category: "literature",
+    coverImage: "/images/books/inconvenient-convenience-store.png",
+    lastUpdated: "2025-07-31",
+    highlights: [
+      {
+        chapter: "노숙자 아저씨 독고씨로부터 배우는 삶의 교훈",
+        quotes: [
+          {
+            text: "그냥 친절한 척만 해도 친절해지는 것 같아요.",
+          },
+          {
+            text: "p.292 결국 삶은 관계였고 관계는 소통이었다.",
+          },
+          {
+            text: [
+              "p. 308 강은 빠지는 곳이 아니라 건너가는 곳임을.",
+              "다리는 건너는 곳이지 뛰어내리는 곳이 아님을.",
+              "눈물이 멈추지 않았다. 부끄럽지만 살기로 했다. 죄스러움을 지니고 있기로 했다.",
+            ],
+            comments: [
+              "사람 한 명 한 명의 사연이 있다. 불편하지만 따듯한 편의점을 통해 사람 관계의 소중함과 회복을 배운다. 한강 물에 뛰어들고 싶은 삶이라도 일어날 수 있는 희망을 배운다.",
             ],
           },
         ],

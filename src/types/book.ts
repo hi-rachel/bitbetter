@@ -4,7 +4,7 @@ export type BookCategory = {
 };
 
 export type Quote = {
-  text: string;
+  text?: string | string[];
   comments?: string[];
 };
 
@@ -22,4 +22,5 @@ export type Book = {
   category: string;
   coverImage: string;
   highlights: BookHighlight[];
+  lastUpdated?: string;
 };

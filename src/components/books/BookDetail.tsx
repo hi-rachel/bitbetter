@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 
-import { AnimatePresence,motion } from "framer-motion";
-import { BookOpen, MessageSquare } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { BookOpen, Clock, MessageSquare } from "lucide-react";
 
 import {
   Dialog,
@@ -136,6 +136,21 @@ export const BookDetail = ({ book, isOpen, onClose }: BookDetailProps) => {
                           index={index}
                         />
                       ))}
+
+                      {/* 마지막 업데이트 날짜 표시 */}
+                      {book.lastUpdated && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.3 }}
+                          className="flex items-center justify-center pt-4 border-t border-gray-200"
+                        >
+                          <div className="flex items-center gap-2 text-gray-500 text-sm">
+                            <Clock className="h-4 w-4" />
+                            <span>마지막 업데이트: {book.lastUpdated}</span>
+                          </div>
+                        </motion.div>
+                      )}
                     </motion.div>
                   ) : (
                     <div className="text-center py-10 md:py-16">
@@ -184,9 +199,22 @@ const HighlightCard = ({ highlight, index }: HighlightCardProps) => {
         {highlight.quotes.map((quote, quoteIndex) => (
           <div key={quoteIndex} className="space-y-3 md:space-y-4">
             <div className="pl-3 md:pl-4 border-l-4 border-primary py-3 md:py-4 bg-white rounded-r-lg">
-              <p className="italic text-gray-700 text-sm md:text-base whitespace-pre-line leading-relaxed">
-                {quote.text}
-              </p>
+              {Array.isArray(quote.text) ? (
+                <div className="space-y-1">
+                  {quote.text.map((text, textIndex) => (
+                    <p
+                      key={textIndex}
+                      className="italic text-gray-700 text-sm md:text-base whitespace-pre-line leading-relaxed"
+                    >
+                      {text}
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <p className="italic text-gray-700 text-sm md:text-base whitespace-pre-line leading-relaxed">
+                  {quote.text}
+                </p>
+              )}
             </div>
 
             {quote.comments && quote.comments.length > 0 && (
