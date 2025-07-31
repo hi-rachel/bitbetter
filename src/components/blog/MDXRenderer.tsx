@@ -171,6 +171,15 @@ const MDXRenderer = ({ code }: MDXRendererProps): React.ReactElement => {
         {children}
       </td>
     ),
+    div: ({
+      children,
+      className,
+      ...props
+    }: React.HTMLAttributes<HTMLDivElement>) => (
+      <div className={className} {...props}>
+        {children}
+      </div>
+    ),
   };
 
   return (
