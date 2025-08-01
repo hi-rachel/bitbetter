@@ -1,0 +1,647 @@
+---
+title: "React 성능 최적화: memo, useMemo, useCallback 완벽 가이드"
+description: "React의 핵심 성능 최적화 도구들을 정확히 이해하고 올바르게 사용하는 방법"
+date: "2025-08-01"
+tags: ["react", "performance", "optimization"]
+---
+
+React 개발에서 성능 최적화는 항상 중요한 주제입니다. 특히 `memo`, `useMemo`, `useCallback`은 React의 핵심 최적화 도구들이지만, 잘못 사용하면 오히려 성능을 저하시킬 수 있습니다. 이 글에서는 각 도구의 정확한 사용법과 주의사항을 깊이 있게 다뤄보겠습니다.
+
+## React 렌더링 메커니즘 이해하기
+
+최적화를 제대로 하려면 먼저 React의 렌더링 메커니즘을 이해해야 합니다.
+
+### React 렌더링 과정
+
+<div className="text-center my-8">
+  <div className="inline-block border-2 border-blue-500 rounded-lg p-4 bg-slate-50">
+    <div className="font-bold text-blue-700 mb-2">React 렌더링 과정</div>
+    <div className="grid grid-cols-4 gap-4 mt-4">
+      <div className="border border-gray-200 p-2 rounded bg-blue-100">
+        <strong>1. Props/State 변경</strong>
+        <br />
+        <small>트리거</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-green-100">
+        <strong>2. 컴포넌트 렌더링</strong>
+        <br />
+        <small>함수 실행</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-yellow-100">
+        <strong>3. Virtual DOM 생성</strong>
+        <br />
+        <small>JSX → 객체</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-red-100">
+        <strong>4. DOM 업데이트</strong>
+        <br />
+        <small>Diffing & Patch</small>
+      </div>
+    </div>
+    <div className="mt-4 text-sm text-gray-500">
+      불필요한 렌더링이 성능 저하의 주요 원인
+    </div>
+  </div>
+</div>
+
+### 불필요한 렌더링의 문제점
+
+```javascript
+// 문제가 되는 예시
+const ParentComponent = () => {
+  const [count, setCount] = useState(0);
+
+  // 매번 새로운 객체 생성
+  const expensiveObject = {
+    data: "some data",
+    timestamp: Date.now(),
+  };
+
+  // 매번 새로운 함수 생성
+  const handleClick = () => {
+    console.log("clicked");
+  };
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>Count: {count}</button>
+      <ExpensiveChild data={expensiveObject} onAction={handleClick} />
+    </div>
+  );
+};
+```
+
+이 예시에서 `count`가 변경될 때마다:
+
+1. `expensiveObject`가 새로 생성됨
+2. `handleClick` 함수가 새로 생성됨
+3. `ExpensiveChild`가 불필요하게 리렌더링됨
+
+## 1. React.memo - 컴포넌트 메모이제이션
+
+### React.memo의 동작 원리
+
+`React.memo`는 컴포넌트를 메모이제이션하여 props가 변경되지 않으면 리렌더링을 방지합니다.
+
+```javascript
+const MemoizedComponent = React.memo(MyComponent, (prevProps, nextProps) => {
+  // 커스텀 비교 함수 (선택사항)
+  return prevProps.value === nextProps.value;
+});
+```
+
+### 올바른 사용법
+
+```javascript
+// ✅ 좋은 예시
+const UserCard = React.memo(({ user, onEdit }) => {
+  return (
+    <div className="user-card">
+      <h3>{user.name}</h3>
+      <p>{user.email}</p>
+      <button onClick={() => onEdit(user.id)}>Edit</button>
+    </div>
+  );
+});
+
+// 부모 컴포넌트
+const UserList = () => {
+  const [users, setUsers] = useState([]);
+
+  // useCallback으로 함수 메모이제이션
+  const handleEdit = useCallback((userId) => {
+    // 편집 로직
+  }, []);
+
+  return (
+    <div>
+      {users.map((user) => (
+        <UserCard key={user.id} user={user} onEdit={handleEdit} />
+      ))}
+    </div>
+  );
+};
+```
+
+### 주의사항
+
+```javascript
+// ❌ 잘못된 예시
+const UserCard = React.memo(({ user, onEdit }) => {
+  return (
+    <div className="user-card">
+      <h3>{user.name}</h3>
+      <p>{user.email}</p>
+      {/* 매번 새로운 함수가 전달됨 */}
+      <button onClick={() => onEdit(user.id)}>Edit</button>
+    </div>
+  );
+});
+
+const UserList = () => {
+  const [users, setUsers] = useState([]);
+
+  // 매번 새로운 함수 생성
+  const handleEdit = (userId) => {
+    // 편집 로직
+  };
+
+  return (
+    <div>
+      {users.map((user) => (
+        <UserCard
+          key={user.id}
+          user={user}
+          onEdit={handleEdit} // 매번 새로운 함수
+        />
+      ))}
+    </div>
+  );
+};
+```
+
+### 언제 사용해야 할까?
+
+**사용해야 하는 경우:**
+
+- 컴포넌트가 자주 리렌더링됨
+- 렌더링 비용이 높음
+- props가 안정적임
+
+**사용하지 말아야 하는 경우:**
+
+- 컴포넌트가 거의 리렌더링되지 않음
+- 렌더링 비용이 낮음
+- props가 자주 변경됨
+
+## 2. useMemo - 값 메모이제이션
+
+### useMemo의 동작 원리
+
+`useMemo`는 계산 비용이 높은 값을 메모이제이션합니다.
+
+```javascript
+const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
+```
+
+### 올바른 사용법
+
+```javascript
+// ✅ 좋은 예시
+const ExpensiveComponent = ({ items, filter }) => {
+  // 계산 비용이 높은 필터링
+  const filteredItems = useMemo(() => {
+    return items.filter((item) =>
+      item.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  }, [items, filter]);
+
+  // 계산 비용이 높은 정렬
+  const sortedItems = useMemo(() => {
+    return [...filteredItems].sort((a, b) => a.name.localeCompare(b.name));
+  }, [filteredItems]);
+
+  return (
+    <div>
+      {sortedItems.map((item) => (
+        <ItemCard key={item.id} item={item} />
+      ))}
+    </div>
+  );
+};
+```
+
+### 성능 비교 예시
+
+```javascript
+// ❌ 성능이 나쁜 예시
+const ExpensiveComponent = ({ items, filter }) => {
+  // 매번 새로운 계산
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  const sortedItems = [...filteredItems].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
+  return (
+    <div>
+      {sortedItems.map((item) => (
+        <ItemCard key={item.id} item={item} />
+      ))}
+    </div>
+  );
+};
+
+// ✅ 성능이 좋은 예시
+const ExpensiveComponent = ({ items, filter }) => {
+  const filteredItems = useMemo(() => {
+    return items.filter((item) =>
+      item.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  }, [items, filter]);
+
+  const sortedItems = useMemo(() => {
+    return [...filteredItems].sort((a, b) => a.name.localeCompare(b.name));
+  }, [filteredItems]);
+
+  return (
+    <div>
+      {sortedItems.map((item) => (
+        <ItemCard key={item.id} item={item} />
+      ))}
+    </div>
+  );
+};
+```
+
+### 언제 사용해야 할까?
+
+**사용해야 하는 경우:**
+
+- 계산 비용이 높은 연산
+- 객체나 배열의 참조 동일성 유지
+- 렌더링 성능에 직접적인 영향
+
+**사용하지 말아야 하는 경우:**
+
+- 계산 비용이 낮은 연산
+- 단순한 값 변환
+- 의존성 배열이 자주 변경됨
+
+## 3. useCallback - 함수 메모이제이션
+
+### useCallback의 동작 원리
+
+`useCallback`은 함수를 메모이제이션하여 불필요한 리렌더링을 방지합니다.
+
+```javascript
+const memoizedCallback = useCallback(() => {
+  doSomething(a, b);
+}, [a, b]);
+```
+
+### 올바른 사용법
+
+```javascript
+// ✅ 좋은 예시
+const ParentComponent = () => {
+  const [count, setCount] = useState(0);
+  const [users, setUsers] = useState([]);
+
+  // 안정적인 함수 참조
+  const handleUserUpdate = useCallback((userId, newData) => {
+    setUsers((prev) =>
+      prev.map((user) => (user.id === userId ? { ...user, ...newData } : user))
+    );
+  }, []);
+
+  const handleUserDelete = useCallback((userId) => {
+    setUsers((prev) => prev.filter((user) => user.id !== userId));
+  }, []);
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>Count: {count}</button>
+      <UserList
+        users={users}
+        onUpdate={handleUserUpdate}
+        onDelete={handleUserDelete}
+      />
+    </div>
+  );
+};
+```
+
+### 성능 비교 예시
+
+```javascript
+// ❌ 성능이 나쁜 예시
+const ParentComponent = () => {
+  const [count, setCount] = useState(0);
+  const [users, setUsers] = useState([]);
+
+  // 매번 새로운 함수 생성
+  const handleUserUpdate = (userId, newData) => {
+    setUsers((prev) =>
+      prev.map((user) => (user.id === userId ? { ...user, ...newData } : user))
+    );
+  };
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>Count: {count}</button>
+      {/* count가 변경될 때마다 UserList가 리렌더링됨 */}
+      <UserList users={users} onUpdate={handleUserUpdate} />
+    </div>
+  );
+};
+
+// ✅ 성능이 좋은 예시
+const ParentComponent = () => {
+  const [count, setCount] = useState(0);
+  const [users, setUsers] = useState([]);
+
+  // 함수 참조가 안정적
+  const handleUserUpdate = useCallback((userId, newData) => {
+    setUsers((prev) =>
+      prev.map((user) => (user.id === userId ? { ...user, ...newData } : user))
+    );
+  }, []);
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>Count: {count}</button>
+      {/* count가 변경되어도 UserList는 리렌더링되지 않음 */}
+      <UserList users={users} onUpdate={handleUserUpdate} />
+    </div>
+  );
+};
+```
+
+### 언제 사용해야 할까?
+
+**사용해야 하는 경우:**
+
+- 함수를 자식 컴포넌트에 props로 전달
+- 함수가 다른 Hook의 의존성으로 사용됨
+- 함수 참조의 안정성이 중요함
+
+**사용하지 말아야 하는 경우:**
+
+- 함수가 컴포넌트 내부에서만 사용됨
+- 함수가 매번 다른 의존성을 가짐
+- 성능상 이점이 미미함
+
+## 성능 측정과 최적화 전략
+
+### React DevTools Profiler 사용
+
+```javascript
+import { Profiler } from "react";
+
+const App = () => {
+  const onRenderCallback = (id, phase, actualDuration) => {
+    console.log(`${id} took ${actualDuration}ms to ${phase}`);
+  };
+
+  return (
+    <Profiler id="App" onRender={onRenderCallback}>
+      <YourComponent />
+    </Profiler>
+  );
+};
+```
+
+### 성능 측정 예시
+
+```javascript
+// 성능 측정을 위한 커스텀 Hook
+const useRenderCount = (componentName) => {
+  const renderCount = useRef(0);
+
+  useEffect(() => {
+    renderCount.current += 1;
+    console.log(`${componentName} rendered ${renderCount.current} times`);
+  });
+
+  return renderCount.current;
+};
+
+// 사용 예시
+const ExpensiveComponent = React.memo(({ data }) => {
+  const renderCount = useRenderCount("ExpensiveComponent");
+
+  return (
+    <div>
+      <p>Render count: {renderCount}</p>
+      {/* 복잡한 렌더링 로직 */}
+    </div>
+  );
+});
+```
+
+## 최적화 패턴과 안티패턴
+
+### 좋은 패턴들
+
+```javascript
+// 1. 조건부 렌더링 최적화
+const ConditionalComponent = ({ condition, data }) => {
+  const expensiveData = useMemo(() => {
+    if (!condition) return null;
+    return processExpensiveData(data);
+  }, [condition, data]);
+
+  if (!condition) return null;
+
+  return <div>{expensiveData}</div>;
+};
+
+// 2. 리스트 렌더링 최적화
+const UserList = ({ users }) => {
+  const sortedUsers = useMemo(() => {
+    return [...users].sort((a, b) => a.name.localeCompare(b.name));
+  }, [users]);
+
+  return (
+    <div>
+      {sortedUsers.map((user) => (
+        <UserCard key={user.id} user={user} />
+      ))}
+    </div>
+  );
+};
+
+// 3. 이벤트 핸들러 최적화
+const FormComponent = () => {
+  const [formData, setFormData] = useState({});
+
+  const handleInputChange = useCallback((field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      // 제출 로직
+    },
+    [formData]
+  );
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input onChange={(e) => handleInputChange("name", e.target.value)} />
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+```
+
+### 피해야 할 패턴들
+
+```javascript
+// ❌ 불필요한 메모이제이션
+const SimpleComponent = ({ text }) => {
+  // 단순한 문자열 변환은 메모이제이션 불필요
+  const processedText = useMemo(() => {
+    return text.toUpperCase();
+  }, [text]);
+
+  return <div>{processedText}</div>;
+};
+
+// ❌ 잘못된 의존성 배열
+const BadExample = ({ user }) => {
+  const userInfo = useMemo(() => {
+    return {
+      name: user.name,
+      email: user.email,
+      // user 객체 전체를 의존성으로 사용
+    };
+  }, [user]); // user 객체가 매번 새로 생성되면 의미없음
+
+  return <div>{userInfo.name}</div>;
+};
+
+// ❌ 과도한 최적화
+const OverOptimizedComponent = ({ data }) => {
+  // 모든 것을 메모이제이션하는 것은 오히려 성능 저하
+  const processedData = useMemo(() => data, [data]);
+  const handleClick = useCallback(() => console.log("clicked"), []);
+
+  return <div onClick={handleClick}>{processedData}</div>;
+};
+```
+
+## 실제 프로젝트에서의 적용
+
+### 1. 대시보드 컴포넌트 최적화
+
+```javascript
+const Dashboard = ({ data, filters }) => {
+  // 복잡한 데이터 처리
+  const processedData = useMemo(() => {
+    return data
+      .filter((item) => filters.status.includes(item.status))
+      .filter((item) => item.date >= filters.startDate)
+      .map((item) => ({
+        ...item,
+        calculatedValue: item.value * item.multiplier,
+      }));
+  }, [data, filters]);
+
+  // 차트 데이터 계산
+  const chartData = useMemo(() => {
+    return processedData.reduce((acc, item) => {
+      const key = item.category;
+      acc[key] = (acc[key] || 0) + item.calculatedValue;
+      return acc;
+    }, {});
+  }, [processedData]);
+
+  // 안정적인 이벤트 핸들러
+  const handleFilterChange = useCallback((newFilters) => {
+    // 필터 변경 로직
+  }, []);
+
+  return (
+    <div>
+      <FilterPanel onFilterChange={handleFilterChange} />
+      <DataTable data={processedData} />
+      <Chart data={chartData} />
+    </div>
+  );
+};
+```
+
+### 2. 폼 컴포넌트 최적화
+
+```javascript
+const ComplexForm = ({ initialData, onSubmit }) => {
+  const [formData, setFormData] = useState(initialData);
+  const [errors, setErrors] = useState({});
+
+  // 유효성 검사 (비용이 높은 연산)
+  const validationErrors = useMemo(() => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "이름은 필수입니다.";
+    }
+
+    if (formData.email && !isValidEmail(formData.email)) {
+      newErrors.email = "올바른 이메일 형식이 아닙니다.";
+    }
+
+    // 복잡한 비즈니스 로직 검증
+    if (formData.age < 18 && formData.requiresAdult) {
+      newErrors.age = "성인 인증이 필요합니다.";
+    }
+
+    return newErrors;
+  }, [formData]);
+
+  // 안정적인 이벤트 핸들러들
+  const handleInputChange = useCallback((field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (Object.keys(validationErrors).length === 0) {
+        onSubmit(formData);
+      }
+    },
+    [formData, validationErrors, onSubmit]
+  );
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <Input
+        value={formData.name}
+        onChange={(e) => handleInputChange("name", e.target.value)}
+        error={validationErrors.name}
+      />
+      <Input
+        value={formData.email}
+        onChange={(e) => handleInputChange("email", e.target.value)}
+        error={validationErrors.email}
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+```
+
+## 결론
+
+React의 성능 최적화는 신중하게 접근해야 합니다:
+
+### 핵심 원칙
+
+1. **측정 후 최적화**: 성능 문제가 실제로 있는지 먼저 확인
+2. **적절한 사용**: 모든 것을 최적화하려 하지 말고 필요한 곳에만 적용
+3. **의존성 관리**: 의존성 배열을 정확히 관리하여 불필요한 재계산 방지
+4. **코드 가독성**: 과도한 최적화로 인한 코드 복잡성 증가 주의
+
+### 체크리스트
+
+- [ ] 실제 성능 문제가 있는가?
+- [ ] 최적화 도구가 적절한 곳에 사용되었는가?
+- [ ] 의존성 배열이 정확한가?
+- [ ] 코드 가독성이 유지되는가?
+- [ ] 테스트가 통과하는가?
+
+성능 최적화는 마지막 단계에서 해야 할 일이지, 처음부터 고려할 사항이 아닙니다. 먼저 기능을 완성하고, 실제 성능 문제가 발생했을 때 적절한 도구를 사용하여 최적화하세요.
+
+---
+
+**참고 자료:**
+
+- [React.memo](https://react.dev/reference/react/memo)
+- [useMemo](https://react.dev/reference/react/useMemo)
+- [useCallback](https://react.dev/reference/react/useCallback)
+- [React Profiler](https://react.dev/reference/react/Profiler)
