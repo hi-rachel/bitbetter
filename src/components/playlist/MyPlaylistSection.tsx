@@ -3,7 +3,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, Edit2, Plus, Share2, X } from "lucide-react";
 
-import { PlaylistGrid } from "@/components/playlist/PlaylistGrid";
+import { PlaylistList } from "@/components/playlist/PlaylistList";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
@@ -171,7 +171,7 @@ export const MyPlaylistSection = () => {
       </motion.div>
 
       {/* 플레이리스트 카드들 */}
-      <PlaylistGrid
+      <PlaylistList
         playlists={customPlaylists}
         showDeleteButton={true}
         onDelete={handleDeletePlaylist}

@@ -3,10 +3,9 @@
 import { useMemo } from "react";
 
 import { motion } from "framer-motion";
-import { Music } from "lucide-react";
 
 import { MyPlaylistSection } from "@/components/playlist/MyPlaylistSection";
-import { PlaylistCard } from "@/components/playlist/PlaylistCard";
+import { PlaylistList } from "@/components/playlist/PlaylistList";
 import { AuroraBackground } from "@/components/ui/AuroraBackground";
 import { PLAYLIST_CATEGORIES } from "@/constants/playlist";
 import { usePlaylists } from "@/hooks/usePlaylists";
@@ -111,39 +110,9 @@ const PlaylistPage = () => {
             <MyPlaylistSection />
           )}
 
-          {/* Playlist Grid */}
+          {/* Playlist List */}
           {selectedCategory !== PLAYLIST_CATEGORIES.MY_PLAYLIST && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-            >
-              {filteredPlaylists.map((playlist, index) => (
-                <PlaylistCard
-                  key={playlist.id}
-                  playlist={playlist}
-                  index={index}
-                />
-              ))}
-            </motion.div>
-          )}
-
-          {/* Empty State */}
-          {filteredPlaylists.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <Music className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                검색 결과가 없습니다
-              </h3>
-              <p className="text-gray-500">
-                다른 검색어나 카테고리를 시도해보세요.
-              </p>
-            </motion.div>
+            <PlaylistList playlists={filteredPlaylists} />
           )}
         </div>
       </div>
