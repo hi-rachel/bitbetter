@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { GoogleAnalytics } from "@next/third-parties/google";
+
 import ClientLayout from "@/components/layout/ClientLayout";
 
 import "./globals.css";
@@ -38,6 +40,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
           content="gPP7sY1hto9tigiWfmR9RgG3B7_Ts2S-SLsfxt5X-Xo"
         />
       </head>
+      <GoogleAnalytics gaId="G-7ZDMQ4RV2D" />
       <body className="antialiased">
         <ClientLayout>{children}</ClientLayout>
       </body>
