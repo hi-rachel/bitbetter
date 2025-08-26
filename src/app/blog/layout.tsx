@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import BlogLayoutClient from "@/components/blog/BlogLayoutClient";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://bitbetter.vercel.app"),
   title: "BitBetter | Blog",
@@ -30,5 +32,5 @@ export default function BlogLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <BlogLayoutClient>{children}</BlogLayoutClient>;
 }
