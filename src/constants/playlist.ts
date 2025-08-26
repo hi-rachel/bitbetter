@@ -4,6 +4,7 @@ export const PLAYLIST_TYPES = {
 } as const;
 
 export const PLAYLIST_CATEGORIES = {
+  ALL: "all",
   MY_PLAYLIST: "my-playlist",
   POP: "pop",
   LOFI: "lofi",

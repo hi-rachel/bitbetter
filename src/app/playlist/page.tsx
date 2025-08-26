@@ -20,7 +20,9 @@ const PlaylistPage = () => {
 
   const filteredPlaylists = allPlaylists.filter((playlist) => {
     const matchesCategory =
-      !selectedCategory || playlist.category === selectedCategory;
+      selectedCategory === PLAYLIST_CATEGORIES.ALL ||
+      selectedCategory === null ||
+      playlist.category === selectedCategory;
     return matchesCategory;
   });
 
@@ -72,8 +74,9 @@ const PlaylistPage = () => {
             {/* Category Filters */}
             <div className="flex flex-wrap justify-center gap-3 relative z-10">
               <button
-                onClick={() => updateSelectedCategory(null)}
+                onClick={() => updateSelectedCategory(PLAYLIST_CATEGORIES.ALL)}
                 className={`px-4 py-2 rounded-full border transition-all relative z-10 ${
+                  selectedCategory === PLAYLIST_CATEGORIES.ALL ||
                   selectedCategory === null
                     ? "bg-indigo-600 text-white border-indigo-600"
                     : "bg-white text-gray-600 border-gray-300 hover:border-indigo-300"
@@ -111,7 +114,9 @@ const PlaylistPage = () => {
           )}
 
           {/* Playlist List */}
-          {selectedCategory !== PLAYLIST_CATEGORIES.MY_PLAYLIST && (
+          {(selectedCategory === PLAYLIST_CATEGORIES.ALL ||
+            selectedCategory === null ||
+            selectedCategory !== PLAYLIST_CATEGORIES.MY_PLAYLIST) && (
             <PlaylistList playlists={filteredPlaylists} />
           )}
         </div>

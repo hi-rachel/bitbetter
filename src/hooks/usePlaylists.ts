@@ -9,7 +9,9 @@ export const usePlaylists = () => {
   const [customPlaylists, setCustomPlaylists] = useState<PlaylistItem[]>([]);
   const [myPlaylistTitle, setMyPlaylistTitle] = useState("My Playlist");
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    PLAYLIST_CATEGORIES.ALL
+  );
 
   // 로컬 스토리지에서 커스텀 플레이리스트와 제목 로드
   useEffect(() => {
@@ -35,6 +37,8 @@ export const usePlaylists = () => {
     );
     if (storedCategory) {
       setSelectedCategory(storedCategory);
+    } else {
+      setSelectedCategory(PLAYLIST_CATEGORIES.ALL);
     }
   }, []);
 
@@ -130,7 +134,7 @@ export const usePlaylists = () => {
     } else {
       localStorage.removeItem(LOCALSTORAGE_KEYS.SELECTED_CATEGORY);
     }
-    setSelectedCategory(category);
+    setSelectedCategory(category || PLAYLIST_CATEGORIES.ALL);
   };
 
   return {
