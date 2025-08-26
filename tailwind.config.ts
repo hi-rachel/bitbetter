@@ -16,6 +16,31 @@ const config: Config = {
         },
         background: "#f8fafc",
       },
+      animation: {
+        "gradient-x": "gradient-x 2s ease-in-out infinite",
+        aurora: "aurora 60s linear infinite",
+      },
+      keyframes: {
+        "gradient-x": {
+          "0%": {
+            "background-position": "0% 50%",
+          },
+          "50%": {
+            "background-position": "100% 50%",
+          },
+          "100%": {
+            "background-position": "0% 50%",
+          },
+        },
+        aurora: {
+          from: {
+            "background-position": "50% 50%, 50% 50%",
+          },
+          to: {
+            "background-position": "350% 50%, 350% 50%",
+          },
+        },
+      },
     },
   },
   plugins: [],
