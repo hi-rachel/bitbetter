@@ -10,6 +10,7 @@ interface PlaylistCardProps {
 }
 
 const categoryColors = {
+  [PLAYLIST_CATEGORIES.ALL]: "bg-gray-100 text-gray-800 border-gray-200",
   [PLAYLIST_CATEGORIES.POP]: "bg-pink-100 text-pink-800 border-pink-200",
   [PLAYLIST_CATEGORIES.LOFI]: "bg-blue-100 text-blue-800 border-blue-200",
   [PLAYLIST_CATEGORIES.JAZZ]: "bg-purple-100 text-purple-800 border-purple-200",
@@ -18,6 +19,7 @@ const categoryColors = {
 };
 
 const categoryIcons = {
+  [PLAYLIST_CATEGORIES.ALL]: "🎵",
   [PLAYLIST_CATEGORIES.POP]: "🎵",
   [PLAYLIST_CATEGORIES.LOFI]: "🎧",
   [PLAYLIST_CATEGORIES.JAZZ]: "🎷",
