@@ -99,7 +99,7 @@ const ImprovementGoals: React.FC<ImprovementGoalsProps> = ({
   };
 
   return (
-    <div className="mt-8 bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+    <div className="mt-8 bg-white p-6 rounded-lg">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold text-slate-800 flex items-center">
           <Target className="w-5 h-5 mr-2 text-indigo-500" />

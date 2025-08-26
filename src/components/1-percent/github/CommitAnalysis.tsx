@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { Calendar, Hash, Star,Trophy } from "lucide-react";
+import { Calendar, Hash, Star, Trophy } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -18,7 +18,6 @@ import {
 import { ContributionDay, Week } from "@/types/github";
 
 import StatCard from "./StatCard";
-
 
 interface DayData {
   name: string;
@@ -292,7 +291,7 @@ const CommitAnalysis = ({
 
   return (
     <div className="space-y-8">
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+      <div className="bg-white p-6 rounded-lg">
         <h2 className="text-xl font-semibold text-slate-800 flex items-center mb-6">
           <Calendar className="w-5 h-5 mr-2 text-purple-500" />
           커밋 패턴 분석
