@@ -49,7 +49,7 @@ const PlaylistPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            className="text-center mb-16"
           >
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-4">
               <span className="block bg-gradient-to-r from-blue-600 via-purple-700 to-violet-800 bg-clip-text text-transparent bg-[length:200%_100%] animate-gradient-x pb-1">
