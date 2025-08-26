@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "작업할 때 듣는 음악 | BitBetter",
+  metadataBase: new URL("https://bitbetter.vercel.app"),
+  title: "BitBetter | Playlist",
   description:
     "작업할 때 듣기 좋은 음악을 확인하고, 나만의 플레이리스트를 만들어 친구, 동료와 공유해 보세요.",
   openGraph: {
-    title: "BitBetter | Playlist",
+    title: "작업할 때 듣기 좋은 플레이리스트 추천",
     description:
       "작업할 때 듣기 좋은 음악을 확인하고, 나만의 플레이리스트를 만들어 친구, 동료와 공유해 보세요.",
     images: [
