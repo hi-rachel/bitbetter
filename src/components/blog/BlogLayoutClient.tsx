@@ -5,8 +5,6 @@ import { usePathname } from "next/navigation";
 
 import { allBlogs } from "contentlayer/generated";
 
-import BlogPage from "@/app/blog/page";
-
 import BlogSidebar from "./BlogSidebar";
 import TOCContainer from "./TOCContainer";
 
@@ -36,10 +34,7 @@ const BlogLayoutClient = ({ children }: BlogLayoutClientProps) => {
 
       {/* 메인 콘텐츠 */}
       <main className="flex-1 min-w-0 px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-10">
-        <div className="max-w-4xl mx-auto w-full">
-          {/* 블로그 메인 페이지면 BlogPage에 props로 직접 렌더링, 상세/기타 페이지면 children 그대로 */}
-          {!isDetailPage ? <BlogPage /> : children}
-        </div>
+        <div className="max-w-4xl mx-auto w-full">{children}</div>
       </main>
 
       {/* 오른쪽 목차 (상세 글 페이지에서만 표시) */}
