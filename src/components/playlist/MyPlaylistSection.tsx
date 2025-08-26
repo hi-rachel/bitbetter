@@ -22,6 +22,7 @@ export const MyPlaylistSection = () => {
     message: "",
     type: "success" as "success" | "error",
   });
+  const [editingTitle, setEditingTitle] = useState("");
   const {
     customPlaylists,
     myPlaylistTitle,
@@ -75,14 +76,20 @@ export const MyPlaylistSection = () => {
   };
 
   const handleEditTitle = () => {
+    setEditingTitle(myPlaylistTitle);
     setIsEditingTitle(true);
   };
 
   const handleSaveTitle = () => {
-    setIsEditingTitle(false);
+    if (editingTitle.trim()) {
+      updateMyPlaylistTitle(editingTitle);
+      setIsEditingTitle(false);
+      window.location.reload();
+    }
   };
 
   const handleCancelEdit = () => {
+    setEditingTitle(myPlaylistTitle);
     setIsEditingTitle(false);
   };
 
@@ -99,11 +106,11 @@ export const MyPlaylistSection = () => {
           {isEditingTitle ? (
             <div className="flex items-center gap-2">
               <Input
-                value={myPlaylistTitle}
+                value={editingTitle}
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value.length <= 20) {
-                    updateMyPlaylistTitle(value);
+                    setEditingTitle(value);
                   }
                 }}
                 className="text-3xl font-bold text-center w-auto min-w-[200px]"
