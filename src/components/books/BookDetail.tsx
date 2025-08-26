@@ -11,9 +11,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "@/components/ui/Dialog";
+import { Separator } from "@/components/ui/Separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Book, BookHighlight } from "@/types/book";
 
 type BookDetailProps = {
@@ -31,7 +31,7 @@ export const BookDetail = ({ book, isOpen, onClose }: BookDetailProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="overflow-hidden border-0 w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl max-h-[95vh] overflow-hidden p-0 gap-0 bg-white">
+      <DialogContent className="overflow-hidden border-0 w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl max-h-[95vh] p-0 gap-0 bg-white">
         <div className="flex flex-col md:flex-row h-full">
           {/* 왼쪽 이미지 섹션 - 모바일에서는 높이 제한, 데스크탑에서는 넓은 공간 */}
           <div className="overflow-hidden md:w-5/12 lg:w-4/12 bg-gradient-to-b from-gray-100 to-white p-6 md:p-8 lg:p-12 flex items-center justify-center relative border-gray-300 border-b-1 border-r-1">

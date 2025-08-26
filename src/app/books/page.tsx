@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 import { BookDetail } from "@/components/books/BookDetail";
 import { BookGrid } from "@/components/books/BookGrid";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { books, categories, getBooksByCategory } from "@/data/books";
 
 const BooksPage = () => {

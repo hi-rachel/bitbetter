@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import { motion } from "framer-motion";
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/Badge";
 import { Book } from "@/types/book";
 
 type BookCardProps = {
