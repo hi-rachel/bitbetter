@@ -1,0 +1,24 @@
+<svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 그라데이션 -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 배경 -->
+  <rect width="320" height="180" fill="url(#bgGradient)" rx="12"/>
+  
+  <!-- 중앙 플레이 아이콘 -->
+  <g transform="translate(160, 90)">
+    <circle cx="0" cy="0" r="30" fill="white" opacity="0.2"/>
+    <polygon points="-12,-18 -12,18 18,0" fill="white" opacity="0.9"/>
+  </g>
+  
+  <!-- 텍스트 -->
+  <text x="160" y="140" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600" opacity="0.9">
+    Playlist
+  </text>
+</svg>
