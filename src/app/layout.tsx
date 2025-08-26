@@ -5,8 +5,28 @@ import ClientLayout from "@/components/layout/ClientLayout";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://bitbetter.vercel.app"),
   title: "BitBetter",
-  description: "1% Everyday Better",
+  description: "매일 1%씩 성장하며, 더 나은 삶과 소프트웨어를 설계합니다.",
+  openGraph: {
+    title: "BitBetter",
+    description: "매일 1%씩 성장하며, 더 나은 삶과 소프트웨어를 설계합니다.",
+    images: [
+      {
+        url: "/images/open-graph/main-og.png",
+        width: 1200,
+        height: 630,
+        alt: "BitBetter - 매일 1%씩 성장하는 개발자",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BitBetter",
+    description: "매일 1%씩 성장하며, 더 나은 삶과 소프트웨어를 설계합니다.",
+    images: ["/images/open-graph/main-og.png"],
+  },
 };
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
