@@ -42,7 +42,7 @@ const PlaylistPage = () => {
 
   return (
     <AuroraBackground className="min-h-screen">
-      <div className="py-12 px-4 sm:px-6 max-w-7xl mx-auto">
+      <div className="py-12 px-4 sm:px-6 max-w-7xl mx-auto z-10">
         <div className="container mx-auto px-4 sm:px-6">
           {/* Header */}
           <motion.div
