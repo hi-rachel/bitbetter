@@ -72,7 +72,7 @@ export const Toast = ({
           animate={{ opacity: 1, x: 0, y: 0 }}
           exit={{ opacity: 0, x: 300, y: -20 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className={`fixed top-4 right-4 z-[100] max-w-sm w-full ${getBgColor()} border rounded-lg shadow-lg p-4`}
+          className={`fixed top-20 right-4 z-[9999] max-w-sm w-full ${getBgColor()} border rounded-lg shadow-lg p-4`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-start gap-3">

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 
 import { Button } from "@/components/ui/Button";
 import {
@@ -10,6 +11,7 @@ import {
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Textarea } from "@/components/ui/Textarea";
+import { Toast } from "@/components/ui/Toast";
 
 interface AddPlaylistDialogProps {
   isOpen: boolean;
@@ -19,18 +21,17 @@ interface AddPlaylistDialogProps {
     url: string;
     description: string;
   }) => void;
-  onInvalidUrl: () => void;
 }
 
 export const AddPlaylistDialog = ({
   isOpen,
   onClose,
   onAdd,
-  onInvalidUrl,
 }: AddPlaylistDialogProps) => {
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [description, setDescription] = useState("");
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   // URL 유효성 검사
   const isValidUrl = (url: string): boolean => {
@@ -48,7 +49,7 @@ export const AddPlaylistDialog = ({
 
     // URL 유효성 검사
     if (!isValidUrl(url.trim())) {
-      onInvalidUrl();
+      setIsToastOpen(true);
       return;
     }
 
@@ -121,6 +122,20 @@ export const AddPlaylistDialog = ({
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* 토스트 알림 - Portal을 사용해서 Dialog 밖으로 렌더링 */}
+      {typeof window !== "undefined" &&
+        createPortal(
+          <Toast
+            isOpen={isToastOpen}
+            onClose={() => setIsToastOpen(false)}
+            title="잘못된 URL"
+            message="올바른 YouTube URL을 입력해주세요. (예: https://www.youtube.com/watch?v=...)"
+            type="error"
+            duration={4000}
+          />,
+          document.body
+        )}
     </>
   );
 };

@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-import { BookOpen,Github, TrendingUp, User } from "lucide-react";
+import { BookOpen, Github, TrendingUp, User } from "lucide-react";
 
 import CommitAnalysis from "@/components/1-percent/github/CommitAnalysis";
 import GitHubCalendar from "@/components/1-percent/github/GitHubCalendar";
 import GitHubSummaryStats from "@/components/1-percent/github/GithubSummaryStats";
 import ImprovementGoals from "@/components/1-percent/github/ImprovementGoals";
 import StatCard from "@/components/1-percent/github/StatCard";
+import { Toast } from "@/components/ui/Toast";
 import { DEFAULT_START_DATE, DEFAULT_USERNAME } from "@/constants/github";
 import {
   fetchGitHubContributions,
@@ -31,6 +32,12 @@ const OnePercentPage = () => {
   const [prevStreak, setPrevStreak] = useState(0);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("dashboard");
+  const [isToastOpen, setIsToastOpen] = useState(false);
+  const [toastConfig, setToastConfig] = useState({
+    title: "",
+    message: "",
+    type: "error" as "error" | "success",
+  });
 
   const [username, setUsername] = useState(() => {
     if (typeof window === "undefined") return DEFAULT_USERNAME;
@@ -77,6 +84,15 @@ const OnePercentPage = () => {
         setSelectedYear(currentYear);
       } catch (err) {
         console.error("GitHub 데이터 로드 실패:", err);
+        setToastConfig({
+          title: "GitHub 데이터 로드 실패",
+          message:
+            err instanceof Error
+              ? err.message
+              : "알 수 없는 오류가 발생했습니다.",
+          type: "error",
+        });
+        setIsToastOpen(true);
       } finally {
         setLoading(false);
       }
@@ -332,6 +348,16 @@ const OnePercentPage = () => {
             </div>
           </>
         )}
+
+        {/* Toast 알림 */}
+        <Toast
+          isOpen={isToastOpen}
+          onClose={() => setIsToastOpen(false)}
+          title={toastConfig.title}
+          message={toastConfig.message}
+          type={toastConfig.type}
+          duration={4000}
+        />
       </div>
     </main>
   );
