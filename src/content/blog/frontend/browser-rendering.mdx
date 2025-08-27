@@ -1,0 +1,893 @@
+---
+title: "브라우저 렌더링 원리: Critical Rendering Path부터 Reflow/Repaint까지"
+description: "프론트엔드 개발자가 꼭 알아야 할 브라우저 렌더링 과정과 성능 최적화 방법"
+date: "2025-08-27"
+tags: ["browser", "performance", "rendering"]
+---
+
+프론트엔드 개발을 하다 보면 "브라우저가 어떻게 웹페이지를 렌더링하는가?"라는 질문을 자주 접하게 됩니다. 이 글에서는 브라우저의 렌더링 과정을 단계별로 자세히 살펴보고, 성능 최적화를 위한 핵심 개념들을 정리해보겠습니다.
+
+## 브라우저 엔진의 구조
+
+### 주요 브라우저 엔진
+
+<div className="text-center my-8">
+  <div className="inline-block border-2 border-blue-500 rounded-lg p-4 bg-slate-50">
+    <div className="font-bold text-blue-700 mb-2">주요 브라우저 엔진</div>
+    <div className="grid grid-cols-3 gap-4 mt-4">
+      <div className="border border-gray-200 p-2 rounded bg-red-100">
+        <strong>Blink</strong>
+        <br />
+        <small>Chrome, Edge</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-orange-100">
+        <strong>Gecko</strong>
+        <br />
+        <small>Firefox</small>
+      </div>
+      <div className="border border-gray-200 p-2 rounded bg-blue-100">
+        <strong>WebKit</strong>
+        <br />
+        <small>Safari</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+### 브라우저 엔진의 구성 요소
+
+모든 브라우저 엔진은 다음과 같은 핵심 구성 요소로 이루어져 있습니다:
+
+1. **렌더링 엔진 (Rendering Engine)**: HTML, CSS를 파싱하고 화면에 그리는 역할
+2. **JavaScript 엔진**: JavaScript 코드를 실행하는 역할
+3. **Networking**: HTTP 요청/응답을 처리하는 역할 (네트워크 스택, DNS 해석, TCP 연결 관리)
+4. **UI 백엔드**: 기본적인 UI 컴포넌트를 그리는 역할 (버튼, 입력창, 드롭다운 등 OS 기본 UI)
+5. **데이터 저장소**: 쿠키, 로컬 스토리지 등을 관리하는 역할
+
+**모든 브라우저가 이 구성 요소를 가진다?**
+
+- **네, 맞습니다**: 모든 현대 브라우저는 이 5가지 핵심 구성 요소를 가지고 있습니다.
+- **구현 방식 차이**: 각 브라우저마다 구현 방식과 성능은 다를 수 있습니다.
+- **예시**: Chrome(Blink), Firefox(Gecko), Safari(WebKit) 모두 동일한 구조
+
+## Critical Rendering Path (중요 렌더링 경로)
+
+Critical Rendering Path는 브라우저가 HTML, CSS, JavaScript를 화면의 픽셀로 변환하는 과정입니다. 이 과정을 이해하는 것이 웹 성능 최적화의 핵심입니다.
+
+### 1단계: HTML 파싱 (HTML Parsing)
+
+브라우저는 HTML 문서를 받으면 다음과 같은 과정을 거칩니다:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>웹페이지</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>제목</h1>
+    <p>내용</p>
+    <script src="script.js"></script>
+  </body>
+</html>
+```
+
+#### 파싱 과정
+
+1. **토큰화 (Tokenization)**: HTML을 개별 토큰으로 분해
+2. **렉싱 (Lexing)**: 토큰을 의미 있는 단위로 변환 (어휘 분석)
+3. **DOM 트리 구축**: 토큰을 기반으로 DOM 노드 생성
+
+> **렉싱 (Lexing)이란?**
+>
+> 렉싱은 **어휘 분석**을 의미합니다. 토큰화된 문자열을 의미 있는 단위로 변환하는 과정입니다.
+
+**예시:**
+
+    ```html
+    <!-- 원본 HTML -->
+    <div class="container">Hello World</div>
+
+    <!-- 토큰화 후 -->
+    ['<', 'div', 'class', '=', '"container"', '>', 'Hello', 'World', '</', 'div', '>']
+
+    <!-- 렉싱 후 -->
+    [
+    { type: 'tag-open', value: 'div' },
+    { type: 'attribute', name: 'class', value: 'container' },
+    { type: 'text', value: 'Hello World' },
+    { type: 'tag-close', value: 'div' }
+    ]
+    ```
+
+#### DOM (Document Object Model) 트리
+
+```javascript
+// DOM 트리 구조
+Document
+├── html
+│   ├── head
+│   │   ├── title
+│   │   └── link
+│   └── body
+│       ├── h1
+│       ├── p
+│       └── script
+```
+
+### 2단계: CSS 파싱 (CSS Parsing)
+
+CSS 파일이나 `<style>` 태그를 만나면 CSS 파싱이 시작됩니다.
+
+#### CSS 파싱 과정
+
+1. **CSS 토큰화**: CSS를 개별 토큰으로 분해
+2. **CSSOM 트리 구축**: CSS 규칙을 기반으로 CSSOM 노드 생성
+
+#### CSSOM (CSS Object Model) 트리
+
+```css
+body {
+  font-size: 16px;
+}
+p {
+  color: blue;
+}
+h1 {
+  font-weight: bold;
+}
+```
+
+```javascript
+// CSSOM 트리 구조
+CSSOM
+├── body
+│   └── font-size: 16px
+├── p
+│   └── color: blue
+└── h1
+    └── font-weight: bold
+```
+
+### 3단계: 렌더 트리 구축 (Render Tree Construction)
+
+DOM과 CSSOM이 완성되면 렌더 트리가 구축됩니다.
+
+#### 렌더 트리 특징
+
+- **표시되는 요소만 포함**: `display: none`인 요소는 제외
+- **시각적 정보 포함**: 레이아웃과 페인팅에 필요한 정보만 포함
+- **계층 구조**: z-index, position 등에 따른 계층 구조 반영
+
+```javascript
+// 렌더 트리 구조 (display: none인 요소 제외)
+Render Tree
+├── body
+│   ├── h1
+│   └── p
+```
+
+### 4단계: 레이아웃 (Layout/Reflow)
+
+레이아웃 단계에서는 각 요소의 정확한 위치와 크기를 계산합니다.
+
+#### 레이아웃 계산 과정
+
+1. **박스 모델 계산**: width, height, padding, border, margin 계산
+2. **위치 계산**: position, float, flexbox, grid 등에 따른 위치 결정
+3. **계층 구조 계산**: z-index, stacking context 등 고려
+
+```css
+/* 레이아웃 계산 예시 */
+.box {
+  width: 200px;
+  height: 100px;
+  padding: 20px;
+  border: 2px solid black;
+  margin: 10px;
+  position: relative;
+  top: 50px;
+}
+```
+
+#### 실제 계산된 크기
+
+- **콘텐츠 박스**: 200px × 100px
+- **패딩 박스**: 240px × 140px (양쪽 패딩 20px씩)
+- **보더 박스**: 244px × 144px (양쪽 보더 2px씩)
+- **마진 박스**: 264px × 164px (양쪽 마진 10px씩)
+
+### 5단계: 페인팅 (Painting)
+
+페인팅 단계에서는 실제로 화면에 픽셀을 그립니다.
+
+#### 페인팅 과정
+
+1. **배경 페인팅**: 배경색, 배경 이미지 그리기
+2. **테두리 페인팅**: border 그리기
+3. **콘텐츠 페인팅**: 텍스트, 이미지 등 그리기
+
+#### 레이어 (Layer) 개념
+
+브라우저는 성능 최적화를 위해 요소들을 레이어로 분리합니다:
+
+> **레이어란?**
+>
+> 브라우저가 성능 최적화를 위해 **요소들을 별도의 레이어로 분리**하는 개념입니다. <br/>
+> 각 레이어는 독립적으로 렌더링되어 GPU 가속을 활용할 수 있습니다.
+
+**레이어 생성 조건:**
+
+```css
+/* 새로운 레이어 생성 */
+.layer {
+  transform: translateZ(0); /* 3D 변환 - 하드웨어 가속 */
+  will-change: transform; /* 변경 예고 - 브라우저에게 미리 알림 */
+  position: fixed; /* 고정 위치 */
+  z-index: 1000; /* 높은 z-index */
+  opacity: 0.5; /* 투명도 */
+}
+```
+
+**레이어의 장점:**
+
+- **독립적 렌더링**: 다른 요소에 영향 없이 개별 렌더링
+- **GPU 가속**: 하드웨어 가속으로 빠른 렌더링
+- **성능 최적화**: 변경된 레이어만 다시 그리기
+
+**레이어의 단점:**
+
+- **메모리 사용량**: 각 레이어는 별도 메모리 공간 필요
+- **과도한 레이어**: 너무 많은 레이어는 오히려 성능 저하
+
+### 6단계: 컴포지팅 (Compositing)
+
+마지막 단계에서는 여러 레이어를 합쳐서 최종 화면을 만듭니다.
+
+#### 컴포지팅 과정
+
+1. **레이어 합성**: 여러 레이어를 하나의 이미지로 합성
+2. **GPU 가속**: 가능한 경우 GPU를 사용하여 빠른 렌더링
+3. **화면 출력**: 최종 이미지를 화면에 표시
+
+## Reflow와 Repaint
+
+### Reflow (레이아웃 재계산)
+
+Reflow는 요소의 레이아웃(위치, 크기)이 변경될 때 발생하는 과정입니다.
+
+#### Reflow가 발생하는 정확한 시점
+
+```javascript
+// 1. 요소 크기 변경
+element.style.width = "200px";
+element.style.height = "100px";
+
+// 2. 요소 위치 변경
+element.style.position = "absolute";
+element.style.top = "50px";
+element.style.left = "100px";
+
+// 3. 요소 표시/숨김
+element.style.display = "none";
+element.style.visibility = "hidden";
+
+// 4. DOM 구조 변경
+parent.appendChild(newElement);
+parent.removeChild(childElement);
+
+// 5. 윈도우 크기 변경
+window.addEventListener("resize", () => {
+  // 모든 요소의 레이아웃 재계산
+});
+
+// 6. 폰트 변경
+element.style.fontSize = "16px";
+
+// 7. 스크롤 위치 변경
+window.scrollTo(0, 100);
+
+// 8. offsetWidth, offsetHeight 등 레이아웃 정보 읽기
+const width = element.offsetWidth; // 강제 reflow 발생
+```
+
+#### Reflow의 비용
+
+Reflow는 매우 비용이 높은 작업입니다:
+
+- **전체 레이아웃 재계산**: 변경된 요소뿐만 아니라 하위 요소들도 재계산
+- **캐시 무효화**: 이전 계산 결과를 버리고 새로 계산
+- **성능 저하**: 복잡한 레이아웃일수록 더 많은 시간 소요
+
+### Repaint (재그리기)
+
+Repaint는 요소의 시각적 속성이 변경될 때 발생하는 과정입니다.
+
+#### Repaint가 발생하는 정확한 시점
+
+```javascript
+// 1. 색상 변경
+element.style.color = "red";
+element.style.backgroundColor = "blue";
+
+// 2. 배경 이미지 변경
+element.style.backgroundImage = "url(new-image.jpg)";
+
+// 3. 테두리 변경
+element.style.border = "2px solid green";
+
+// 4. 그림자 변경
+element.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+
+// 5. 투명도 변경
+element.style.opacity = "0.5";
+
+// 6. 가시성 변경 (visibility)
+element.style.visibility = "hidden";
+
+// 7. 테두리 반경 변경
+element.style.borderRadius = "10px";
+
+// 8. 텍스트 정렬 변경
+element.style.textAlign = "center";
+```
+
+#### Repaint vs Reflow
+
+<table className="w-full border-collapse border border-gray-200">
+  <thead>
+    <tr className="bg-gray-50">
+      <th className="border border-gray-200 p-3 text-left">구분</th>
+      <th className="border border-gray-200 p-3 text-left">Reflow</th>
+      <th className="border border-gray-200 p-3 text-left">Repaint</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td className="border border-gray-200 p-3 font-semibold">발생 조건</td>
+      <td className="border border-gray-200 p-3">레이아웃 변경</td>
+      <td className="border border-gray-200 p-3">시각적 속성 변경</td>
+    </tr>
+    <tr className="bg-gray-50">
+      <td className="border border-gray-200 p-3 font-semibold">비용</td>
+      <td className="border border-gray-200 p-3">매우 높음</td>
+      <td className="border border-gray-200 p-3">중간</td>
+    </tr>
+    <tr>
+      <td className="border border-gray-200 p-3 font-semibold">영향 범위</td>
+      <td className="border border-gray-200 p-3">전체 또는 하위 요소</td>
+      <td className="border border-gray-200 p-3">해당 요소만</td>
+    </tr>
+    <tr className="bg-gray-50">
+      <td className="border border-gray-200 p-3 font-semibold">최적화 방법</td>
+      <td className="border border-gray-200 p-3">transform, position 사용</td>
+      <td className="border border-gray-200 p-3">가능한 한 피하기</td>
+    </tr>
+  </tbody>
+</table>
+
+## 성능 최적화 기법
+
+### 1. Reflow 최소화
+
+#### 배치 읽기/쓰기 최적화
+
+```javascript
+// ❌ 나쁜 예시 - 매번 reflow 발생
+const element = document.getElementById("box");
+element.style.width = "100px"; // reflow
+element.style.height = "100px"; // reflow
+element.style.margin = "10px"; // reflow
+
+// ✅ 좋은 예시 - 한 번에 처리
+const element = document.getElementById("box");
+element.style.cssText = "width: 100px; height: 100px; margin: 10px;"; // 한 번의 reflow
+
+// ✅ 더 좋은 예시 - 클래스 사용
+element.className = "optimized-box";
+```
+
+#### 레이아웃 정보 읽기 최적화
+
+```javascript
+// ❌ 나쁜 예시 - 강제 reflow 발생
+const element = document.getElementById("box");
+element.style.width = "100px";
+const width = element.offsetWidth; // 강제 reflow
+element.style.height = width + "px";
+
+// ✅ 좋은 예시 - 변수 사용
+const element = document.getElementById("box");
+const newWidth = 100;
+element.style.width = newWidth + "px";
+element.style.height = newWidth + "px";
+```
+
+### 2. Transform과 Opacity 활용
+
+**transform이 reflow가 없는 이유:**
+
+- **GPU 가속 사용**: 브라우저가 해당 요소를 별도의 레이어로 분리하여 GPU에서 처리
+- **레이아웃 엔진을 거치지 않음**: 요소의 위치를 변경하지만 문서의 레이아웃 흐름에는 영향 없음
+- **컴포지팅 단계에서만 처리**: 레이아웃 → 페인팅 → **컴포지팅** 단계에서만 처리되어 성능이 좋음
+
+**will-change: transform의 의미:**
+
+- **브라우저에게 미리 알림**: "이 요소가 transform으로 변경될 예정이다"라고 브라우저에게 미리 알려줌
+- **레이어 생성**: 브라우저가 해당 요소를 별도의 레이어로 미리 분리하여 준비
+- **GPU 가속 활성화**: 하드웨어 가속을 미리 활성화하여 성능을 최적화
+
+```css
+/* ❌ 나쁜 예시 - reflow 발생 */
+.animate {
+  left: 100px;
+  top: 100px;
+}
+
+/* ✅ 좋은 예시 - transform 사용 (reflow 없음) */
+.animate {
+  transform: translate(100px, 100px);
+}
+
+/* ✅ 좋은 예시 - opacity 사용 (repaint만 발생) */
+.fade {
+  opacity: 0.5;
+}
+```
+
+### 3. Document Fragment 사용
+
+**Document Fragment란?**
+
+Document Fragment는 **DOM 노드들을 임시로 담아두는 컨테이너**입니다.
+
+**특징:**
+
+- **메모리상에만 존재**: 실제 DOM에는 추가되지 않음
+- **일괄 처리**: 여러 노드를 한 번에 DOM에 추가할 수 있음
+- **성능 최적화**: DOM 조작을 최소화하여 reflow를 줄임
+
+**사용 이유:**
+
+```javascript
+// ❌ 나쁜 예시 - 1000번의 reflow 발생
+for (let i = 0; i < 1000; i++) {
+  container.appendChild(div); // 매번 DOM 조작
+}
+
+// ✅ 좋은 예시 - 1번의 reflow만 발생
+const fragment = document.createDocumentFragment();
+for (let i = 0; i < 1000; i++) {
+  fragment.appendChild(div); // 메모리상에서만 조작
+}
+container.appendChild(fragment); // 한 번만 DOM 조작
+```
+
+```javascript
+// ❌ 나쁜 예시 - 매번 reflow 발생
+const container = document.getElementById("container");
+for (let i = 0; i < 1000; i++) {
+  const div = document.createElement("div");
+  div.textContent = `Item ${i}`;
+  container.appendChild(div); // 매번 reflow
+}
+
+// ✅ 좋은 예시 - Document Fragment 사용
+const container = document.getElementById("container");
+const fragment = document.createDocumentFragment();
+
+for (let i = 0; i < 1000; i++) {
+  const div = document.createElement("div");
+  div.textContent = `Item ${i}`;
+  fragment.appendChild(div);
+}
+
+container.appendChild(fragment); // 한 번의 reflow
+```
+
+### 4. 가상화 (Virtualization)
+
+**가상화란?**
+
+대용량 데이터를 효율적으로 렌더링하기 위해 **화면에 보이는 요소만 렌더링**하는 기법입니다.
+
+**왜 필요한가?**
+
+- **대용량 데이터**: 10만 개의 리스트 아이템을 모두 렌더링하면 브라우저가 느려짐
+- **메모리 사용량**: DOM 노드가 많을수록 메모리 사용량이 증가
+- **스크롤 성능**: 많은 요소가 있으면 스크롤이 느려짐
+
+**동작 원리:**
+
+```javascript
+// 예시: 화면에 보이는 10개 아이템만 렌더링
+const visibleItems = 10;
+const itemHeight = 50;
+const scrollTop = 500; // 스크롤 위치
+
+const startIndex = Math.floor(scrollTop / itemHeight); // 10
+const endIndex = startIndex + visibleItems; // 20
+
+// 10번째~20번째 아이템만 렌더링
+for (let i = startIndex; i < endIndex; i++) {
+  renderItem(i);
+}
+```
+
+**실제 사용 사례:**
+
+- **React**: `react-window`, `react-virtualized`
+- **Vue**: `vue-virtual-scroller`
+- **무한 스크롤**: Instagram, Twitter의 피드
+
+```javascript
+// 대용량 리스트 최적화
+class VirtualList {
+  constructor(container, itemHeight, totalItems) {
+    this.container = container;
+    this.itemHeight = itemHeight;
+    this.totalItems = totalItems;
+    this.visibleItems = Math.ceil(container.clientHeight / itemHeight);
+    this.scrollTop = 0;
+
+    this.setupContainer();
+    this.render();
+  }
+
+  setupContainer() {
+    this.container.style.height = `${this.totalItems * this.itemHeight}px`;
+    this.container.addEventListener("scroll", this.onScroll.bind(this));
+  }
+
+  onScroll() {
+    this.scrollTop = this.container.scrollTop;
+    this.render();
+  }
+
+  render() {
+    const startIndex = Math.floor(this.scrollTop / this.itemHeight);
+    const endIndex = Math.min(startIndex + this.visibleItems, this.totalItems);
+
+    // 보이는 아이템만 렌더링
+    this.container.innerHTML = "";
+    for (let i = startIndex; i < endIndex; i++) {
+      const item = this.createItem(i);
+      item.style.position = "absolute";
+      item.style.top = `${i * this.itemHeight}px`;
+      this.container.appendChild(item);
+    }
+  }
+
+  createItem(index) {
+    const div = document.createElement("div");
+    div.textContent = `Item ${index}`;
+    div.style.height = `${this.itemHeight}px`;
+    return div;
+  }
+}
+```
+
+## 브라우저 개발자 도구 활용
+
+### Performance 탭 분석
+
+#### 1. Timeline 기록
+
+성능 문제가 있는 구간을 녹화하여 전체적인 성능 패턴을 파악합니다.
+
+#### 2. Flame Chart 분석
+
+> **Flame Chart란?**
+>
+> Flame Chart는 브라우저의 성능 프로파일링 도구에서 사용하는 시각화 차트입니다. <br/>
+> 함수 호출 스택과 실행 시간을 **불꽃 모양**으로 표현합니다.
+
+**어떻게 분석하나?**
+
+- **가로축**: 시간 (왼쪽에서 오른쪽으로)
+- **세로축**: 호출 스택 (위에서 아래로)
+- **너비**: 함수 실행 시간 (넓을수록 오래 걸림)
+- **색상**: 함수 타입별 구분 (JavaScript, 렌더링, 페인팅 등)
+
+**분석 예시:**
+
+```javascript
+// 성능 문제가 있는 코드
+function expensiveFunction() {
+  for (let i = 0; i < 1000000; i++) {
+    // 복잡한 계산
+  }
+}
+
+// Flame Chart에서 보면:
+// - expensiveFunction이 매우 넓은 막대로 표시됨
+// - 다른 함수들보다 훨씬 오래 실행됨을 시각적으로 확인
+```
+
+#### 3. FPS 모니터링
+
+> **FPS란?**
+>
+> FPS (Frames Per Second)는 **초당 프레임 수**를 의미합니다. 화면이 1초에 몇 번 갱신되는지를 나타냅니다.
+
+**어떻게 모니터링하나?**
+
+- **Chrome DevTools**: Performance 탭에서 FPS 차트 확인
+- **FPS Meter**: 개발자 도구에서 실시간 FPS 표시
+- **프로그래밍 방식**: `requestAnimationFrame`으로 측정
+
+**FPS 측정 예시:**
+
+```javascript
+let frameCount = 0;
+let lastTime = performance.now();
+
+function measureFPS() {
+  frameCount++;
+  const currentTime = performance.now();
+
+  if (currentTime - lastTime >= 1000) {
+    // 1초마다
+    const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+    console.log(`FPS: ${fps}`);
+
+    frameCount = 0;
+    lastTime = currentTime;
+  }
+
+  requestAnimationFrame(measureFPS);
+}
+
+measureFPS();
+```
+
+#### 4. 60fps와 성능 기준
+
+> **60fps란?**
+>
+> 60fps는 1초에 60번 화면이 갱신된다는 의미입니다.
+
+**계산:**
+
+- **60fps = 16.67ms** (1000ms ÷ 60 = 16.67ms)
+- 즉, 각 프레임이 16.67ms 이내에 완료되어야 60fps 유지
+
+**성능 기준:**
+
+<table className="w-full border-collapse border border-gray-200">
+  <thead>
+    <tr className="bg-gray-50">
+      <th className="border border-gray-200 p-3 text-left">FPS</th>
+      <th className="border border-gray-200 p-3 text-left">상태</th>
+      <th className="border border-gray-200 p-3 text-left">설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td className="border border-gray-200 p-3 font-semibold">60fps</td>
+      <td className="border border-gray-200 p-3">🟢 최적</td>
+      <td className="border border-gray-200 p-3">
+        부드러운 애니메이션, 사용자 경험 우수
+      </td>
+    </tr>
+    <tr className="bg-gray-50">
+      <td className="border border-gray-200 p-3 font-semibold">30fps</td>
+      <td className="border border-gray-200 p-3">🟡 보통</td>
+      <td className="border border-gray-200 p-3">
+        기본적인 사용 가능, 약간의 끊김 감지
+      </td>
+    </tr>
+    <tr>
+      <td className="border border-gray-200 p-3 font-semibold">15fps</td>
+      <td className="border border-gray-200 p-3">🔴 나쁨</td>
+      <td className="border border-gray-200 p-3">
+        명확한 끊김, 사용자 경험 저하
+      </td>
+    </tr>
+    <tr className="bg-gray-50">
+      <td className="border border-gray-200 p-3 font-semibold">10fps 이하</td>
+      <td className="border border-gray-200 p-3">⚫ 매우 나쁨</td>
+      <td className="border border-gray-200 p-3">
+        심각한 성능 문제, 사용 불가능
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+**좋은 숫자 기준:**
+
+- **60fps**: 웹 애플리케이션의 **골드 스탠다드**
+- **30fps**: 모바일이나 저사양 기기에서 **최소 기준**
+- **90fps 이상**: VR/AR, 게임 등 고성능 요구사항
+
+**성능 최적화 목표:**
+
+- **메인 스레드 작업**: 16ms 이내 완료
+- **JavaScript 실행**: 10ms 이내 완료
+- **레이아웃 계산**: 3ms 이내 완료
+- **페인팅**: 3ms 이내 완료
+
+#### 5. Memory 사용량
+
+메모리 누수 확인 및 메모리 사용량 패턴 분석
+
+### Rendering 탭 활용
+
+**Rendering 탭 위치:**
+
+1. **Chrome DevTools 열기**: F12 또는 우클릭 → 검사
+2. **More tools 버튼 클릭**: DevTools 우측 상단의 ⋮ (점 3개) 버튼
+3. **More tools 메뉴에서 "Rendering" 선택**
+4. **또는 단축키**: Ctrl+Shift+P (Windows) / Cmd+Shift+P (Mac) → "Show Rendering" 입력
+
+**참고**: 최신 Chrome 버전에서는 "More tools" → "Rendering" 또는 "Performance" 탭 내에서 "Rendering" 섹션을 찾을 수 있습니다.
+
+**주요 기능들:**
+
+#### 1. Paint flashing
+
+- **기능**: repaint되는 영역을 **초록색 박스**로 하이라이트
+- **용도**: 불필요한 repaint가 발생하는 영역을 시각적으로 확인
+- **활용**: 성능 최적화 시 어떤 요소가 자주 repaint되는지 파악
+
+#### 2. Scrolling performance issues
+
+- **기능**: 스크롤 성능 병목이 있는 요소를 **빨간색 박스**로 표시
+- **용도**: 스크롤 시 성능 저하를 일으키는 요소 식별
+- **해결**: `transform: translateZ(0)` 또는 `will-change: transform` 적용
+
+#### 3. Layout shift regions
+
+- **기능**: 레이아웃이 변경되는 영역을 **파란색 박스**로 표시
+- **용도**: CLS (Cumulative Layout Shift) 문제 요소 식별
+- **해결**: 이미지에 `width`, `height` 속성 추가, 동적 콘텐츠 영역 예약
+
+#### 4. Frame rate bars
+
+- **기능**: 각 프레임의 렌더링 시간을 막대 그래프로 표시
+- **용도**: 60fps 유지 여부를 실시간으로 확인
+- **분석**: 막대가 높을수록 해당 프레임에서 성능 문제 발생
+
+**실제 활용 예시:**
+
+```javascript
+// 1. Paint flashing으로 확인할 수 있는 문제
+const button = document.querySelector(".button");
+button.addEventListener("click", () => {
+  // 매번 새로운 색상으로 변경 → repaint 발생
+  button.style.backgroundColor = `hsl(${Math.random() * 360}, 50%, 50%)`;
+});
+
+// 2. Scrolling performance issues로 확인할 수 있는 문제
+const heavyElement = document.querySelector(".heavy");
+// 스크롤 시 복잡한 계산 → 성능 병목
+window.addEventListener("scroll", () => {
+  heavyElement.style.transform = `translateY(${window.scrollY}px)`;
+});
+```
+
+## 실전 성능 최적화 예시
+
+### 1. 애니메이션 최적화
+
+```css
+/* ❌ 나쁜 예시 */
+.animate {
+  animation: slide 1s ease-in-out;
+}
+
+@keyframes slide {
+  0% {
+    left: 0;
+  }
+  100% {
+    left: 100px;
+  }
+}
+
+/* ✅ 좋은 예시 */
+.animate {
+  animation: slide 1s ease-in-out;
+  will-change: transform;
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100px);
+  }
+}
+```
+
+### 2. 스크롤 이벤트 최적화
+
+**throttle이란?**
+
+일정 시간 간격으로 함수 실행을 제한하는 기법입니다. 예를 들어 16ms마다 한 번씩만 실행하여 60fps를 유지합니다.
+
+**throttle vs debounce:**
+
+- **throttle**: 일정 시간 간격으로 함수 실행 (예: 16ms마다)
+- **debounce**: 마지막 호출 후 일정 시간 대기 후 실행
+
+```javascript
+// ❌ 나쁜 예시 - 매번 실행
+window.addEventListener("scroll", () => {
+  const scrollTop = window.scrollY;
+  // 복잡한 계산...
+});
+
+// ✅ 좋은 예시 - Throttling 사용
+function throttle(func, limit) {
+  let inThrottle;
+  return function () {
+    const args = arguments;
+    const context = this;
+    if (!inThrottle) {
+      func.apply(context, args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
+}
+
+window.addEventListener(
+  "scroll",
+  throttle(() => {
+    const scrollTop = window.scrollY;
+    // 복잡한 계산...
+  }, 16)
+); // 60fps에 맞춰 16ms 간격
+```
+
+### 3. 이미지 최적화
+
+```html
+<!-- ❌ 나쁜 예시 -->
+<img src="large-image.jpg" alt="Large Image" />
+
+<!-- ✅ 좋은 예시 -->
+<img
+  src="large-image.jpg"
+  alt="Large Image"
+  loading="lazy"
+  width="800"
+  height="600"
+  srcset="small.jpg 400w, medium.jpg 800w, large.jpg 1200w"
+  sizes="(max-width: 600px) 400px, (max-width: 1200px) 800px, 1200px"
+/>
+```
+
+## 결론
+
+브라우저 렌더링 원리를 이해하는 것은 웹 성능 최적화의 기초입니다. 특히 Reflow와 Repaint의 발생 시점을 정확히 파악하고, 이를 최소화하는 방법을 익히는 것이 중요합니다.
+
+### 핵심 포인트
+
+1. **Critical Rendering Path 이해**: HTML → CSS → Render Tree → Layout → Paint → Composite
+2. **Reflow/Repaint 구분**: 레이아웃 변경 vs 시각적 속성 변경
+3. **성능 최적화 기법**: transform 사용, 배치 처리, 가상화 등
+4. **개발자 도구 활용**: Performance 탭으로 실제 성능 측정
+
+### 체크리스트
+
+- [ ] DOM 조작을 최소화했는가?
+- [ ] transform과 opacity를 활용했는가?
+- [ ] 레이아웃 정보 읽기를 최적화했는가?
+- [ ] 애니메이션에 will-change를 사용했는가?
+- [ ] 스크롤 이벤트에 throttling을 적용했는가?
+
+성능 최적화는 지속적인 과정입니다. 정기적으로 성능을 측정하고 개선하는 습관을 가집시다.
+
+---
+
+**참고 자료:**
+
+- [Critical Rendering Path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path)
+- [Browser Rendering Optimization](https://developers.google.com/web/fundamentals/performance/rendering)
+- [Reflow and Repaint](https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing)
+- [WebKit Rendering](https://webkit.org/blog/114/webcore-rendering-ii-the-render-tree/)
+- [Chrome DevTools Performance](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance)
