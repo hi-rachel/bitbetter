@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { notFound } from "next/navigation";
@@ -9,6 +8,7 @@ import { notFound } from "next/navigation";
 import { allBlogs } from "contentlayer/generated";
 import { format } from "date-fns";
 
+import GiscusComments from "@/components/blog/GiscusComments";
 import MDXRenderer from "@/components/blog/MDXRenderer";
 import { FOLDER_NAME_MAPPING } from "@/constants/blog";
 
@@ -104,6 +104,7 @@ const BlogDetailPage = () => {
             <MDXRenderer code={post.body.code} />
           </div>
         </article>
+        <GiscusComments />
       </div>
     );
   }
