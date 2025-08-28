@@ -6,6 +6,8 @@ import Link from "next/link";
 import { allBlogs, Blog } from "contentlayer/generated";
 import { format } from "date-fns";
 
+import RandomQuoteCard from "./RandomQuoteCard";
+
 const getAllTags = (posts: Blog[]): string[] => {
   const tagSet = new Set<string>();
   posts.forEach((post) => {
@@ -58,6 +60,9 @@ const BlogPageClient = () => {
         </h1>
         <p className="text-gray-600">관심 있는 주제를 선택해보세요</p>
       </div>
+
+      {/* 랜덤 명언 카드 */}
+      <RandomQuoteCard />
 
       {/* 태그 필터링 섹션 - 접기/펼치기 가능 */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
