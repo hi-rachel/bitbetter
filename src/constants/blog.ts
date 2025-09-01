@@ -12,4 +12,5 @@ export const FOLDER_NAME_MAPPING: Record<string, string> = {
   git: "Git",
   frontend: "Frontend",
   nextjs: "Next.js",
+  etc: "Etc",
 };
