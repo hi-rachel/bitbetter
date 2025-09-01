@@ -1,0 +1,497 @@
+---
+title: "백트래킹 이해하기"
+date: "2025-09-01"
+description: "백준 N과 M (2) 문제 풀이와 함께 DFS/백트래킹 이해하기"
+tags: ["백트래킹"]
+---
+
+# N과 M (2) - DFS/백트래킹 이해하기
+
+> 오늘은 백트래킹을 이해해 보겠습니다. <br/>
+> 그동안 알고리즘을 풀면서 제일 이해하기 어려웠던 것 중에 하나가 백트래킹이었는데, <br/>
+> 백준 N과 M (2) 문제를 다시 풀어보면서 실행 원리를 파헤쳐 보겠습니다.
+
+## 백트래킹이란?
+
+백트래킹(Backtracking)이란? **해를 찾는 도중 해가 아니어서 막히면, 되돌아가서 다시 해를 찾아가는 기법**을 말합니다.
+
+### 핵심 아이디어
+
+1. **상태 공간 트리**: 모든 가능한 해를 트리 구조로 표현
+2. **깊이 우선 탐색(DFS)**: 한 경로를 끝까지 탐색
+3. **상태 되돌리기**: 해가 아니면 이전 상태로 되돌아가 다른 경로 시도
+
+### 왜 백트래킹인가?
+
+```
+상태 공간 트리 예시 (N=3, M=2)
+        시작
+       /  |  \
+      1   2   3
+     / \  |   |
+    2  3  3   (끝)
+   /   |  |
+  (끝) | (끝)
+       |
+     (끝)
+```
+
+- **깊이 우선**: [1] → [1,2] → [1,3] → [2] → [2,3] → [3]
+- **상태 되돌리기**: [1,2]에서 2를 제거하고 [1,3] 시도
+
+## 관련 문제
+
+👉 문제: [https://www.acmicpc.net/problem/15650](https://www.acmicpc.net/problem/15650)
+
+## 문제 요약
+
+- 1부터 N까지의 자연수 중에서 중복 없이 M개를 선택
+- 선택된 수열은 오름차순이어야 함
+- 모든 가능한 조합을 출력
+
+## 핵심 개념
+
+### 1. 함수 호출 스택 (Call Stack)
+
+```python
+def dfs(1):
+    # dfs(1)이 실행 중일 때
+    dfs(2)  # ← 여기서 dfs(1)은 일시 중단되고 dfs(2)가 실행됨
+    # dfs(2)가 완전히 끝나고 나서야 여기로 돌아옴
+```
+
+**중요**: 재귀 함수는 한 번에 하나씩만 실행됩니다. 각 재귀 호출이 완전히 끝나고 나서야 다음 단계로 진행됩니다.
+
+### 2. 백트래킹의 핵심
+
+**"상태를 되돌리는" 개념**
+
+```python
+arr.append(i)  # 상태 변경
+dfs(i + 1)     # 재귀 호출
+arr.pop()      # 상태 되돌리기 ← 이게 백트래킹!
+```
+
+### 3. 백트래킹 vs 완전 탐색
+
+<table>
+  <thead>
+    <tr>
+      <th>구분</th>
+      <th>완전 탐색</th>
+      <th>백트래킹</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>메모리 사용</td>
+      <td>모든 상태를 저장</td>
+      <td>현재 경로만 저장</td>
+    </tr>
+    <tr>
+      <td>효율성</td>
+      <td>비효율적</td>
+      <td>효율적 (가지치기 가능)</td>
+    </tr>
+    <tr>
+      <td>구현</td>
+      <td>단순</td>
+      <td>상태 관리 필요</td>
+    </tr>
+  </tbody>
+</table>
+
+## 완전한 코드
+
+```python
+N, M = map(int, input().split())
+arr = []
+
+def dfs(number):
+    if len(arr) == M:
+        print(*arr)
+        return
+
+    for i in range(number, N + 1):
+        arr.append(i)
+        dfs(i + 1)
+        arr.pop()
+
+dfs(1)
+```
+
+## 실행 흐름 상세 분석
+
+### N=3, M=2인 경우로 예시
+
+<table>
+  <thead>
+    <tr>
+      <th>단계</th>
+      <th>함수 호출</th>
+      <th>현재 상태</th>
+      <th>실행 내용</th>
+      <th>결과</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>dfs(1)</td>
+      <td>arr = []</td>
+      <td>for i in range(1, 4): [1,2,3]</td>
+      <td>i=1 선택</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>dfs(2)</td>
+      <td>arr = [1]</td>
+      <td>for i in range(2, 4): [2,3]</td>
+      <td>i=2 선택 → 출력 "1 2"</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>dfs(2) 계속</td>
+      <td>arr = [1]</td>
+      <td>i=3 선택</td>
+      <td>출력 "1 3"</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>dfs(1) 복귀</td>
+      <td>arr = []</td>
+      <td>i=2 선택</td>
+      <td>새로운 경로 시작</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>dfs(3)</td>
+      <td>arr = [2]</td>
+      <td>for i in range(3, 4): [3]</td>
+      <td>출력 "2 3"</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>dfs(1) 복귀</td>
+      <td>arr = []</td>
+      <td>i=3 선택</td>
+      <td>마지막 경로</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>dfs(4)</td>
+      <td>arr = [3]</td>
+      <td>for i in range(4, 4): []</td>
+      <td>빈 범위, 아무것도 출력 안함</td>
+    </tr>
+  </tbody>
+</table>
+
+## 단계별 실행 과정
+
+### 1단계: dfs(1) 호출
+
+```python
+dfs(1)  # number = 1
+```
+
+**for 루프: `range(1, 4)` = [1, 2, 3]**
+
+#### i=1일 때:
+
+```python
+arr = []  # 초기 상태
+i = 1
+arr.append(1)  # arr = [1]
+dfs(2)  # 다음 재귀 호출 (i+1 = 2)
+# dfs(1)은 여기서 일시 중단, dfs(2)가 완전히 끝날 때까지 기다림
+```
+
+### 2단계: dfs(2) 완전 실행
+
+```python
+dfs(2)  # number = 2
+```
+
+**for 루프: `range(2, 4)` = [2, 3]**
+
+```python
+i = 2: arr = [1,2] → len(arr) == M → 출력 "1 2" → return
+i = 3: arr = [1,3] → len(arr) == M → 출력 "1 3" → return
+```
+
+### 3단계: dfs(2) 완료 후 dfs(1)로 돌아감
+
+```python
+# dfs(2)가 완전히 끝나고 나서야
+arr.pop()  # arr = [1]에서 1 제거 → arr = []
+```
+
+**이제 for 루프의 다음 반복으로 넘어감**
+
+#### i=2일 때:
+
+```python
+i = 2
+arr.append(2)  # arr = [2]
+dfs(3)  # dfs(3) 호출하고 완전히 끝날 때까지 기다림
+```
+
+### 4단계: dfs(3) 완전 실행
+
+```python
+dfs(3)  # number = 3
+```
+
+**for 루프: `range(3, 4)` = [3]**
+
+```python
+i = 3: arr = [2,3] → len(arr) == M → 출력 "2 3" → return
+```
+
+### 5단계: dfs(3) 완료 후 dfs(1)로 돌아감
+
+```python
+arr.pop()  # arr = [2]에서 2 제거 → arr = []
+```
+
+#### i=3일 때:
+
+```python
+i = 3
+arr.append(3)  # arr = [3]
+dfs(4)  # dfs(4) 호출
+```
+
+### 6단계: dfs(4) 호출 (범위 초과)
+
+```python
+dfs(4)  # number = 4
+```
+
+**for 루프: `range(4, 4)` = 빈 범위!**
+
+```python
+# len(arr) == M? → False (1 ≠ 2)
+# for 루프가 한 번도 실행되지 않음
+# 함수가 그냥 종료됨 (아무것도 출력하지 않음)
+```
+
+### 7단계: dfs(4) 완료 후 dfs(1)로 돌아감
+
+```python
+arr.pop()  # arr = [3]에서 3 제거 → arr = []
+```
+
+## 핵심 포인트
+
+### 1. 오름차순 보장 방법
+
+```python
+dfs(i + 1)  # 다음 재귀에서는 i+1부터 시작
+```
+
+- 이렇게 하면 자연스럽게 오름차순이 보장됨
+- 예: [1,2] 다음에는 3부터 시작, [2,3] 다음에는 4부터 시작
+
+### 2. 백트래킹의 필요성
+
+```python
+arr.pop()  # 선택한 숫자를 제거
+```
+
+- 각 숫자를 선택한 후, 다음 경우를 위해 선택을 취소
+- 이렇게 해야 모든 가능한 조합을 탐색할 수 있음
+
+### 3. 범위 초과 처리
+
+```python
+for i in range(number, N + 1):
+    # number가 N+1 이상이면 빈 범위가 됨
+    # for 루프가 한 번도 실행되지 않음
+    # 함수가 아무것도 하지 않고 종료됨
+```
+
+## 실행 순서 시각화
+
+```
+dfs(1) 시작
+├── i=1: [1] → dfs(2) 시작
+│   ├── i=2: [1,2] → 출력 "1 2"
+│   └── i=3: [1,3] → 출력 "1 3"
+│   dfs(2) 완료 → arr.pop() → arr = []
+├── i=2: [2] → dfs(3) 시작
+│   └── i=3: [2,3] → 출력 "2 3"
+│   dfs(3) 완료 → arr.pop() → arr = []
+└── i=3: [3] → dfs(4) 시작 (아무것도 안함)
+    dfs(4) 완료 → arr.pop() → arr = []
+dfs(1) 완료
+```
+
+## 디버깅을 위한 코드
+
+실제 실행 흐름을 보려면:
+
+```python
+def dfs(number, depth=0):
+    indent = "  " * depth  # 들여쓰기로 깊이 표시
+    print(f"{indent}dfs({number}) 호출 - 현재 arr: {arr}")
+
+    if len(arr) == M:
+        print(f"{indent}→ 출력: {arr}")
+        return
+
+    for i in range(number, N + 1):
+        print(f"{indent}i={i} 처리 시작")
+        arr.append(i)
+        print(f"{indent}append({i}) 후 arr: {arr}")
+        dfs(i + 1, depth + 1)
+        arr.pop()
+        print(f"{indent}pop() 후 arr: {arr}")
+```
+
+## 시간 복잡도
+
+<table>
+  <thead>
+    <tr>
+      <th>구분</th>
+      <th>복잡도</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>시간 복잡도</td>
+      <td>O(C(N,M))</td>
+      <td>조합의 개수만큼 재귀 호출 발생</td>
+    </tr>
+    <tr>
+      <td>공간 복잡도</td>
+      <td>O(M)</td>
+      <td>재귀 호출 깊이 + arr 배열 크기</td>
+    </tr>
+  </tbody>
+</table>
+
+## 간단한 조합 풀이 코드
+
+### itertools 사용 (가장 간단)
+
+```python
+from itertools import combinations
+
+N, M = map(int, input().split())
+numbers = list(range(1, N + 1))
+
+for combo in combinations(numbers, M):
+    print(*combo)
+```
+
+## 코드 분석
+
+### itertools.combinations 분석
+
+<table>
+  <thead>
+    <tr>
+      <th>구분</th>
+      <th>설명</th>
+      <th>장점</th>
+      <th>단점</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>동작 원리</td>
+      <td>라이브러리 내장 함수</td>
+      <td>간단하고 빠름</td>
+      <td>내부 동작 이해 어려움</td>
+    </tr>
+    <tr>
+      <td>메모리 사용</td>
+      <td>하나씩 생성 (제너레이터)</td>
+      <td>메모리 효율적</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>학습 효과</td>
+      <td>알고리즘 이해 없음</td>
+      <td>빠른 해결</td>
+      <td>개념 학습 안됨</td>
+    </tr>
+  </tbody>
+</table>
+
+## 다른 접근 방법과 비교
+
+<table>
+  <thead>
+    <tr>
+      <th>방법</th>
+      <th>장점</th>
+      <th>단점</th>
+      <th>적용 상황</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>DFS + 백트래킹</td>
+      <td>직관적, 메모리 효율적</td>
+      <td>재귀 호출 오버헤드</td>
+      <td>조합, 순열 문제</td>
+    </tr>
+    <tr>
+      <td>반복문 + 스택</td>
+      <td>재귀 오버헤드 없음</td>
+      <td>구현이 복잡</td>
+      <td>깊이가 깊은 경우</td>
+    </tr>
+    <tr>
+      <td>itertools.combinations</td>
+      <td>간단, 빠름</td>
+      <td>라이브러리 의존</td>
+      <td>실제 프로젝트</td>
+    </tr>
+  </tbody>
+</table>
+
+## 마무리
+
+### 백트래킹의 핵심 정리
+
+이 알고리즘은 조합(Combination)을 구하는 전형적인 DFS + 백트래킹 패턴입니다.
+
+**핵심 포인트**:
+
+1. **재귀 함수는 한 번에 하나씩만 실행됨**
+2. **각 재귀 호출이 완전히 끝나고 나서야 다음 단계로 진행**
+3. **`arr.pop()`으로 상태를 되돌려서 모든 가능한 조합을 탐색**
+4. **`dfs(i + 1)`로 오름차순을 자연스럽게 보장**
+
+### 백트래킹의 장점
+
+- **메모리 효율성**: 현재 경로만 저장
+- **가지치기 가능**: 조건에 맞지 않으면 조기 종료
+- **모든 해 탐색**: 빠짐없이 모든 가능한 경우 확인
+
+### 실전 적용 팁
+
+1. **상태 관리**: 어떤 정보를 저장/복원할지 명확히
+2. **종료 조건**: 언제 탐색을 멈출지 정확히 정의
+3. **가지치기**: 불필요한 탐색을 줄이는 조건 추가
+4. **디버깅**: 실행 흐름을 시각화하여 이해하기
+
+이 패턴을 이해하면 비슷한 백트래킹 문제들을 쉽게 해결할 수 있습니다!
+
+---
+
+**다음 단계**: 이제 [N과 M (1) - 순열](https://www.acmicpc.net/problem/15649) 문제로 넘어가서 순열과 조합의 차이점을 이해해보세요!
+
+## 연습 문제 추천
+
+- [N과 M (1) - 순열](https://www.acmicpc.net/problem/15649)
+- [N과 M (3) - 중복 순열](https://www.acmicpc.net/problem/15651)
+- [N과 M (4) - 중복 조합](https://www.acmicpc.net/problem/15652)
+- [부분수열의 합](https://www.acmicpc.net/problem/1182)
+- [스타트와 링크](https://www.acmicpc.net/problem/14889)
