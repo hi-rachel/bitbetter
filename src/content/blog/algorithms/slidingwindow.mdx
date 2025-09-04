@@ -1,0 +1,559 @@
+---
+title: "슬라이딩 윈도우 이해하기"
+date: "2025-09-04"
+description: "LeetCode Longest Substring Without Repeating Characters 문제 풀이와 함께 슬라이딩 윈도우 알고리즘 이해하기"
+tags: ["슬라이딩 윈도우", "투 포인터"]
+---
+
+# Longest Substring Without Repeating Characters - 슬라이딩 윈도우 이해하기
+
+오늘은 슬라이딩 윈도우(Sliding Window) 알고리즘을 이해해 보겠습니다. <br/>
+문자열이나 배열에서 연속된 부분을 효율적으로 탐색하는 핵심 기법 중 하나입니다. <br/>
+LeetCode의 "Longest Substring Without Repeating Characters" 문제를 통해 실제 구현 방법을 알아보겠습니다.
+
+## 슬라이딩 윈도우란?
+
+슬라이딩 윈도우(Sliding Window)란?
+
+**고정된 크기 또는 가변 크기의 윈도우를 배열이나 문자열 위에서 슬라이드하면서 문제를 해결하는 기법**입니다.
+
+### 핵심 아이디어
+
+1. **윈도우**: 연속된 부분 배열/문자열을 나타내는 구간
+2. **투 포인터**: 윈도우의 시작점(left)과 끝점(right)을 관리
+3. **조건 확인**: 윈도우가 특정 조건을 만족하는지 검사
+4. **윈도우 조정**: 조건에 따라 윈도우를 확장하거나 축소
+
+### 언제 사용하는가?
+
+```
+슬라이딩 윈도우 적용 상황:
+✅ 연속된 부분 배열/문자열 문제
+✅ 최대/최소 길이 구하기
+✅ 특정 조건을 만족하는 구간 찾기
+✅ 중복 제거 문제
+```
+
+## 관련 문제
+
+👉 문제: [https://leetcode.com/problems/longest-substring-without-repeating-characters/](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+
+## 문제 요약
+
+- 주어진 문자열에서 중복 문자가 없는 가장 긴 부분 문자열의 길이를 구하기
+- 예시: "abcabcbb" → "abc" (길이 3)
+- 예시: "bbbbb" → "b" (길이 1)
+- 예시: "pwwkew" → "wke" (길이 3)
+
+## 핵심 개념
+
+### 1. 윈도우 상태 관리
+
+```python
+left = 0    # 윈도우 시작점
+right = 0   # 윈도우 끝점
+seen = {}   # 문자의 마지막 등장 위치 저장
+```
+
+**중요**: 윈도우 `[left, right]`는 항상 중복 문자가 없는 상태를 유지해야 합니다.
+
+### 2. 슬라이딩 윈도우의 핵심 로직
+
+**"윈도우 확장과 축소"**
+
+```python
+# 윈도우 내에 중복 문자가 있는지 확인
+if char in seen and seen[char] >= left:
+    # 윈도우 시작점을 중복 문자 다음 위치로 이동
+    left = seen[char] + 1
+
+# 현재 문자의 위치 업데이트
+seen[char] = right
+```
+
+### 3. 슬라이딩 윈도우 vs 브루트 포스
+
+<table>
+  <thead>
+    <tr>
+      <th>구분</th>
+      <th>브루트 포스</th>
+      <th>슬라이딩 윈도우</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>시간복잡도</td>
+      <td>O(n³)</td>
+      <td>O(n)</td>
+    </tr>
+    <tr>
+      <td>공간복잡도</td>
+      <td>O(1)</td>
+      <td>O(min(m,n))</td>
+    </tr>
+    <tr>
+      <td>효율성</td>
+      <td>비효율적</td>
+      <td>매우 효율적</td>
+    </tr>
+    <tr>
+      <td>구현 복잡도</td>
+      <td>단순</td>
+      <td>중간</td>
+    </tr>
+  </tbody>
+</table>
+
+## 완전한 코드
+
+### 최적화된 슬라이딩 윈도우 해법
+
+```python
+def lengthOfLongestSubstring(s: str) -> int:
+    """
+    중복 문자가 없는 가장 긴 부분 문자열의 길이를 구하는 함수
+
+    Args:
+        s: 입력 문자열
+
+    Returns:
+        중복 문자가 없는 가장 긴 부분 문자열의 길이
+    """
+    if not s:
+        return 0
+
+    left = 0  # 윈도우 시작점
+    max_length = 0  # 최대 길이
+    seen = {}  # 문자의 마지막 등장 위치를 저장하는 해시맵
+
+    for right in range(len(s)):
+        char = s[right]
+
+        # 현재 문자가 윈도우 내에 이미 존재하는 경우
+        if char in seen and seen[char] >= left:
+            # 윈도우 시작점을 중복 문자 다음 위치로 이동
+            left = seen[char] + 1
+
+        # 현재 문자의 위치 업데이트
+        seen[char] = right
+
+        # 현재 윈도우 길이와 최대 길이 비교 후 업데이트
+        max_length = max(max_length, right - left + 1)
+
+    return max_length
+```
+
+## 실행 흐름 상세 분석
+
+### 예시: s = "abcabcbb"로 단계별 분석
+
+<table>
+  <thead>
+    <tr>
+      <th>단계</th>
+      <th>right</th>
+      <th>char</th>
+      <th>seen</th>
+      <th>left</th>
+      <th>윈도우</th>
+      <th>길이</th>
+      <th>max_length</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>0</td>
+      <td>'a'</td>
+      <td>{`{'a': 0}`}</td>
+      <td>0</td>
+      <td>"a"</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>1</td>
+      <td>'b'</td>
+      <td>{`{'a': 0, 'b': 1}`}</td>
+      <td>0</td>
+      <td>"ab"</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>2</td>
+      <td>'c'</td>
+      <td>{`{'a': 0, 'b': 1, 'c': 2}`}</td>
+      <td>0</td>
+      <td>"abc"</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3</td>
+      <td>'a'</td>
+      <td>{`{'a': 3, 'b': 1, 'c': 2}`}</td>
+      <td>1</td>
+      <td>"bca"</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>4</td>
+      <td>'b'</td>
+      <td>{`{'a': 3, 'b': 4, 'c': 2}`}</td>
+      <td>2</td>
+      <td>"cab"</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>5</td>
+      <td>'c'</td>
+      <td>{`{'a': 3, 'b': 4, 'c': 5}`}</td>
+      <td>3</td>
+      <td>"abc"</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>6</td>
+      <td>'b'</td>
+      <td>{`{'a': 3, 'b': 6, 'c': 5}`}</td>
+      <td>5</td>
+      <td>"cb"</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>7</td>
+      <td>'b'</td>
+      <td>{`{'a': 3, 'b': 7, 'c': 5}`}</td>
+      <td>7</td>
+      <td>"b"</td>
+      <td>1</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+
+## 단계별 실행 과정
+
+### 1단계: 초기화
+
+```python
+s = "abcabcbb"
+left = 0
+max_length = 0
+seen = {}
+```
+
+### 2단계: right=0, char='a'
+
+```python
+# 'a'는 seen에 없음
+seen['a'] = 0  # seen = {'a': 0}
+max_length = max(0, 0-0+1) = 1
+# 윈도우: "a" [0:0]
+```
+
+### 3단계: right=1, char='b'
+
+```python
+# 'b'는 seen에 없음
+seen['b'] = 1  # seen = {'a': 0, 'b': 1}
+max_length = max(1, 1-0+1) = 2
+# 윈도우: "ab" [0:1]
+```
+
+### 4단계: right=2, char='c'
+
+```python
+# 'c'는 seen에 없음
+seen['c'] = 2  # seen = {'a': 0, 'b': 1, 'c': 2}
+max_length = max(2, 2-0+1) = 3
+# 윈도우: "abc" [0:2]
+```
+
+### 5단계: right=3, char='a' (중복 발견!)
+
+```python
+# 'a'가 seen에 있고, seen['a']=0 >= left=0
+left = seen['a'] + 1 = 0 + 1 = 1  # 윈도우 축소
+seen['a'] = 3  # 위치 업데이트
+max_length = max(3, 3-1+1) = 3
+# 윈도우: "bca" [1:3]
+```
+
+### 6단계: right=4, char='b' (중복 발견!)
+
+```python
+# 'b'가 seen에 있고, seen['b']=1 >= left=1
+left = seen['b'] + 1 = 1 + 1 = 2  # 윈도우 축소
+seen['b'] = 4  # 위치 업데이트
+max_length = max(3, 4-2+1) = 3
+# 윈도우: "cab" [2:4]
+```
+
+## 핵심 포인트
+
+### 1. 윈도우 축소 조건
+
+```python
+if char in seen and seen[char] >= left:
+    left = seen[char] + 1
+```
+
+- `seen[char] >= left`: 중복 문자가 현재 윈도우 내에 있는지 확인
+- 윈도우 밖의 중복은 무시해야 함
+
+### 2. 해시맵 활용
+
+```python
+seen = {}  # 문자 → 마지막 등장 위치
+```
+
+- O(1) 시간에 중복 검사 가능
+- 문자의 위치 정보로 윈도우 조정
+
+### 3. 윈도우 길이 계산
+
+```python
+window_length = right - left + 1
+```
+
+- `right`와 `left`는 인덱스이므로 +1 필요
+
+## 실행 순서 시각화
+
+```
+s = "abcabcbb"
+     ^
+   left=0, right=0, 윈도우="a", 길이=1
+
+s = "abcabcbb"
+     ^^
+   left=0, right=1, 윈도우="ab", 길이=2
+
+s = "abcabcbb"
+     ^^^
+   left=0, right=2, 윈도우="abc", 길이=3
+
+s = "abcabcbb"
+      ^^^
+   left=1, right=3, 윈도우="bca", 길이=3 (중복 'a' 처리)
+
+s = "abcabcbb"
+       ^^^
+   left=2, right=4, 윈도우="cab", 길이=3 (중복 'b' 처리)
+```
+
+## 다른 해법들과 비교
+
+### 방법 1: 브루트 포스 (O(n³))
+
+```python
+def lengthOfLongestSubstring_bruteforce(s: str) -> int:
+    def is_unique(start, end):
+        chars = set()
+        for i in range(start, end + 1):
+            if s[i] in chars:
+                return False
+            chars.add(s[i])
+        return True
+
+    n = len(s)
+    max_length = 0
+
+    for i in range(n):
+        for j in range(i, n):
+            if is_unique(i, j):
+                max_length = max(max_length, j - i + 1)
+
+    return max_length
+```
+
+### 방법 2: 기본 슬라이딩 윈도우 (O(2n))
+
+```python
+def lengthOfLongestSubstring_basic(s: str) -> int:
+    left = 0
+    max_length = 0
+    seen = set()
+
+    for right in range(len(s)):
+        # 중복 문자가 있을 때까지 left를 이동
+        while s[right] in seen:
+            seen.remove(s[left])
+            left += 1
+
+        seen.add(s[right])
+        max_length = max(max_length, right - left + 1)
+
+    return max_length
+```
+
+## 시간 복잡도 분석
+
+<table>
+  <thead>
+    <tr>
+      <th>방법</th>
+      <th>시간복잡도</th>
+      <th>공간복잡도</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>브루트 포스</td>
+      <td>O(n³)</td>
+      <td>O(min(m,n))</td>
+      <td>모든 부분 문자열을 확인</td>
+    </tr>
+    <tr>
+      <td>기본 슬라이딩 윈도우</td>
+      <td>O(2n)</td>
+      <td>O(min(m,n))</td>
+      <td>각 문자가 최대 2번 방문</td>
+    </tr>
+    <tr>
+      <td>최적화된 슬라이딩 윈도우</td>
+      <td>O(n)</td>
+      <td>O(min(m,n))</td>
+      <td>각 문자가 최대 1번 방문</td>
+    </tr>
+  </tbody>
+</table>
+
+_m: 문자셋 크기 (예: ASCII는 128)_
+
+## 디버깅을 위한 코드
+
+실제 실행 흐름을 보려면:
+
+```python
+def lengthOfLongestSubstring_debug(s: str) -> int:
+    if not s:
+        return 0
+
+    left = 0
+    max_length = 0
+    seen = {}
+
+    print(f"입력 문자열: '{s}'")
+    print("-" * 50)
+
+    for right in range(len(s)):
+        char = s[right]
+        print(f"Step {right+1}: char='{char}', right={right}")
+
+        if char in seen and seen[char] >= left:
+            old_left = left
+            left = seen[char] + 1
+            print(f"  중복 발견! left: {old_left} → {left}")
+
+        seen[char] = right
+        current_length = right - left + 1
+        max_length = max(max_length, current_length)
+
+        window = s[left:right+1]
+        print(f"  윈도우: '{window}' [{left}:{right}], 길이: {current_length}")
+        print(f"  seen: {seen}")
+        print(f"  max_length: {max_length}")
+        print()
+
+    return max_length
+```
+
+## 슬라이딩 윈도우 패턴 정리
+
+### 가변 크기 윈도우 템플릿
+
+```python
+def sliding_window_template(s):
+    left = 0
+    result = 0
+    window_state = {}  # 윈도우 상태를 저장
+
+    for right in range(len(s)):
+        # 1. 윈도우에 새로운 요소 추가
+        # window_state에 s[right] 추가
+
+        # 2. 윈도우가 유효하지 않으면 축소
+        while not is_valid_window():
+            # window_state에서 s[left] 제거
+            left += 1
+
+        # 3. 현재 윈도우에서 결과 업데이트
+        result = max(result, right - left + 1)
+
+    return result
+```
+
+## 관련 문제들
+
+### 비슷한 슬라이딩 윈도우 문제들
+
+1. **[Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)**
+
+   - 주어진 문자들을 모두 포함하는 최소 윈도우 찾기
+
+2. **[Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/)**
+
+   - 고정 크기 윈도우에서 최대값 찾기
+
+3. **[Longest Repeating Character Replacement](https://leetcode.com/problems/longest-repeating-character-replacement/)**
+
+   - K번 문자 교체로 만들 수 있는 가장 긴 동일 문자 부분 문자열
+
+4. **[Fruit Into Baskets](https://leetcode.com/problems/fruit-into-baskets/)**
+   - 최대 2종류 과일로 만들 수 있는 가장 긴 연속 구간
+
+## 마무리
+
+### 슬라이딩 윈도우의 핵심 정리
+
+이 알고리즘은 **연속된 부분 배열/문자열** 문제를 효율적으로 해결하는 핵심 패턴입니다.
+
+**핵심 포인트**:
+
+1. **투 포인터 관리**: left와 right로 윈도우 경계 관리
+2. **상태 유지**: 해시맵/셋으로 윈도우 내 정보 추적
+3. **조건 확인**: 윈도우가 문제 조건을 만족하는지 검사
+4. **동적 조정**: 조건에 따라 윈도우를 확장하거나 축소
+
+### 슬라이딩 윈도우의 장점
+
+- **시간 효율성**: O(n) 시간복잡도로 선형 탐색
+- **공간 효율성**: 추가 배열 생성 없이 포인터만 사용
+- **직관적 구현**: 문제의 본질을 그대로 코드로 표현
+
+### 실전 적용 팁
+
+1. **문제 분석**: 연속된 구간을 다루는 문제인지 확인
+2. **조건 정의**: 유효한 윈도우의 조건을 명확히 정의
+3. **상태 관리**: 윈도우 내 정보를 효율적으로 추적할 방법 선택
+4. **경계 처리**: 윈도우가 비어있거나 전체 배열인 경우 고려
+
+이 패턴을 마스터하면 문자열/배열의 연속 구간 문제들을 효율적으로 해결할 수 있습니다!
+
+---
+
+**다음 단계**: 이제 [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/) 문제로 넘어가서 더 복잡한 슬라이딩 윈도우 패턴을 학습해보세요!
+
+## 연습 문제 추천
+
+- [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)
+- [Sliding Window Maximum](https://leetcode.com/problems/sliding-window-maximum/)
+- [Longest Repeating Character Replacement](https://leetcode.com/problems/longest-repeating-character-replacement/)
+- [Permutation in String](https://leetcode.com/problems/permutation-in-string/)
+- [Find All Anagrams in a String](https://leetcode.com/problems/find-all-anagrams-in-a-string/)
