@@ -11,19 +11,19 @@ tags: ["Next.js"]
 
 - 사용자의 요청이 들어올 때마다 서버에서 HTML을 생성해 전달합니다.
 - 항상 최신 데이터를 반영할 수 있습니다.
-- App Router에서는 별도의 `getServerSideProps` 없이 서버 컴포넌트와 `fetch`를 사용하면 SSR이 기본 동작입니다.
+- App Router에서는 `fetch`에 `{ cache: 'no-store' }` 옵션시 SSR로 동작합니다. (ver.15 기본값)
 
 ### SSG (Static Site Generation)
 
 - 빌드 타임에 미리 HTML을 생성해 정적 파일로 서빙합니다.
 - 빠른 응답 속도와 CDN 캐싱에 유리합니다.
-- App Router에서는 `fetch`에 `cache: 'force-cache'`(기본값)를 사용하면 SSG로 동작합니다.
+- App Router에서는 `fetch`에 `{ cache: 'force-cache' }`를 사용하면 SSG로 동작합니다. (ver.14 기본값)
   - [공식 문서 참고](https://nextjs.org/docs/app/building-your-application/data-fetching/caching#static-data-fetching-default)
 
 ### ISR (Incremental Static Regeneration)
 
 - SSG의 한계를 보완해, 정적 파일을 일정 주기로 백그라운드에서 재생성합니다.
-- App Router에서는 `fetch`에 `next: { revalidate: N }` 옵션을 주면 ISR이 적용됩니다.
+- App Router에서는 `fetch`에 `{ next: { revalidate: N } }` 옵션을 주면 ISR이 적용됩니다.
   - [공식 문서 참고](https://nextjs.org/docs/app/building-your-application/data-fetching/revalidating#time-based-revalidation)
 
 ### CSR (Client Side Rendering)
@@ -33,95 +33,15 @@ tags: ["Next.js"]
 
 ---
 
-## 2. 'use client'가 없을 때 SSR/SSG/ISR 동작 방식과 fetch 옵션에 따른 차이
+## 2. Next.js 15 이상에서 fetch 기본 동작 변화
 
-- `'use client'`가 없으면 해당 파일(컴포넌트)은 <b>서버 컴포넌트(React Server Component, RSC)</b>로 동작합니다.
-- 서버 컴포넌트는 SSR, SSG, ISR 모두 지원할 수 있습니다.
-- **SSR/SSG/ISR 중 어떤 방식이 적용되는지는 fetch 옵션에 따라 달라집니다.**
-
-### fetch 옵션에 따른 동작 방식
-
-- **기본값**: fetch에 아무 옵션도 주지 않으면 `cache: 'force-cache'`가 기본값입니다. 이 경우 **SSG**(정적 사이트 생성)처럼 동작합니다. (빌드 타임에 한 번만 데이터 패칭, 정적 HTML 생성)
-- **SSR**: fetch에 `{ cache: 'no-store' }` 또는 `{ cache: 'reload' }` 옵션을 주면 **SSR**(서버사이드 렌더링)처럼 동작합니다. (매 요청마다 서버에서 데이터 패칭, HTML 생성)
-- **ISR**: fetch에 `{ next: { revalidate: N } }` 옵션을 주면 **ISR**(증분 정적 재생성)처럼 동작합니다. (정적 파일을 N초마다 백그라운드에서 재생성)
-
-#### 공식 문서 참고
-
-- [Data Fetching: Caching (SSG)](https://nextjs.org/docs/app/building-your-application/data-fetching/caching#static-data-fetching-default)
-- [Data Fetching: Revalidating Data (ISR)](https://nextjs.org/docs/app/building-your-application/data-fetching/revalidating#time-based-revalidation)
-- [Data Fetching: No Store (SSR)](https://nextjs.org/docs/app/building-your-application/data-fetching/caching#dynamic-data-fetching-no-store)
-
-### 요약
-
-- `'use client'`가 없으면 **서버 컴포넌트**로 동작
-- **SSR/SSG/ISR 중 어떤 방식이 적용되는지는 fetch 옵션에 따라 달라짐**
-  - 기본값(force-cache): SSG
-  - next.revalidate: ISR
-  - no-store: SSR
-
-## Next.js 15 이상에서 fetch 기본 동작 변화
-
-- **Next.js 14 이하**: fetch의 기본 옵션은 `cache: 'force-cache'` (SSG, 정적 캐싱)
-- **Next.js 15 이상**: fetch의 기본 옵션이 `no-store` (SSR, 매 요청마다 서버 패칭)로 변경됨
+- **Next.js 14 이하**: fetch의 기본 옵션은 `{ cache: 'force-cache' }` (SSG, 정적 캐싱)
+- **Next.js 15 이상**: fetch의 기본 옵션이 `{ cache: 'no-store' }` (SSR, 매 요청마다 서버 패칭)로 변경됨
 - 즉, Next.js 15 이상에서는 별도 옵션 없이 fetch를 사용하면 <b>SSR(서버사이드 렌더링)</b>이 기본 동작입니다.
 - 정적 캐싱(SSG/ISR)을 원하면 반드시 fetch 옵션을 명시해야 합니다.
 
 > In Next.js 15, fetch defaults to no-store, meaning data is not cached by default and is always fetched on the server.  
 > [공식 문서 참고](https://nextjs.org/blog/next-15#fetch-defaults-to-no-store)
-
----
-
-## fetch 옵션별 동작 방식 정리
-
-<table>
-  <thead>
-    <tr>
-      <th>옵션</th>
-      <th>설명</th>
-      <th>동작 방식</th>
-      <th>Next.js 버전</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>cache: 'force-cache'</td>
-      <td>정적 캐싱(빌드 타임/최초 요청 시 데이터 패칭, 이후 캐시)</td>
-      <td>SSG</td>
-      <td>14 이하(기본), 15 이상(명시 필요)</td>
-    </tr>
-    <tr>
-      <td>next: &#123; revalidate: N &#125;</td>
-      <td>N초마다 정적 파일을 백그라운드에서 재생성</td>
-      <td>ISR</td>
-      <td>14 이하/15 이상(명시 필요)</td>
-    </tr>
-    <tr>
-      <td>cache: 'no-store'</td>
-      <td>항상 서버에서 데이터 패칭, 캐싱 없음</td>
-      <td>SSR</td>
-      <td>14 이하(명시 필요), 15 이상(기본)</td>
-    </tr>
-    <tr>
-      <td>cache: 'reload'</td>
-      <td>항상 서버에서 데이터 패칭, 브라우저 캐시 무시</td>
-      <td>SSR</td>
-      <td>14 이하/15 이상(명시 필요)</td>
-    </tr>
-    <tr>
-      <td>cache: 'force-dynamic'</td>
-      <td>항상 서버에서 데이터 패칭, 정적 최적화 완전 비활성화</td>
-      <td>SSR(동적 경로 강제)</td>
-      <td>14 이하/15 이상(명시 필요)</td>
-    </tr>
-  </tbody>
-</table>
-
-- **SSG**: 정적 캐싱, 빌드 타임/최초 요청 시 데이터 패칭 후 캐시(14 이하 기본, 15 이상 명시 필요)
-- **ISR**: 일정 주기로 정적 파일 재생성(명시 필요)
-- **SSR**: 항상 서버에서 데이터 패칭(15 이상 기본, 14 이하 명시 필요)
-- **force-dynamic**: SSR + 정적 최적화 완전 비활성화(동적 경로 강제)
-
-> [공식 문서 - fetch 옵션](https://nextjs.org/docs/app/building-your-application/data-fetching/caching) > [Next.js 15 Release Candidate - fetch 기본값 변경](https://nextjs.org/blog/next-15#fetch-defaults-to-no-store)
 
 ---
 
@@ -224,6 +144,7 @@ export default async function DashboardPage() {
 ```tsx
 // app/dashboard/UserChart.tsx (클라이언트 컴포넌트)
 "use client";
+
 import { useState } from "react";
 
 export default function UserChart({ data }) {
@@ -437,17 +358,17 @@ const ExpensiveList = React.memo(function ExpensiveList({ items }) {
     <tr>
       <td>SSR</td>
       <td>요청마다 서버에서 HTML 생성, 항상 최신 데이터</td>
-      <td>`fetch` 등 서버 데이터 패칭 시 SSR</td>
+      <td>`fetch`에 `{ cache: 'no-store' }` (ver.15 기본값)</td>
     </tr>
     <tr>
       <td>SSG</td>
       <td>빌드 타임에 정적 HTML 생성, 빠른 응답</td>
-      <td>`fetch`에 `cache: 'force-cache'`(기본값) 사용</td>
+      <td>`fetch`에 `{ cache: 'force-cache' }` (ver.14 기본값)</td>
     </tr>
     <tr>
       <td>ISR</td>
       <td>정적 파일을 일정 주기로 재생성, 최신성+성능</td>
-      <td>`fetch`에 `next: { revalidate: N }` 옵션 사용</td>
+      <td>`fetch`에 `{ next: { revalidate: N } }` 옵션 사용</td>
     </tr>
     <tr>
       <td>CSR</td>
@@ -539,6 +460,6 @@ Next.js SSR, SSG, CSR, ISR 등등 연관되는 개념들이 많아서 포스팅�
 
 실무에서 실제로 캐시나 렌더링 최적화를 다룰 일들이 생기고, 이해하지 못하고 쓰면 예상치 못한 버그가 발생할 수 있습니다.
 
-올바르게 활용하기 위해 사용하는 버전과 공식문서를 항상 참고할 것을 추천합니다 🙂
+올바르게 활용하기 위해 사용하는 버전과 공식문서를 항상 참고할 것을 추천합니다.
 
 ---
