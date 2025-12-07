@@ -19,6 +19,7 @@ const HeaderNavigation = () => {
     { name: "Blog", path: "blog" },
     { name: "Books", path: "books" },
     { name: "Playlist", path: "playlist" },
+    { name: "Projects", path: "projects" },
     { name: "1%", path: "1-percent" },
   ];
 

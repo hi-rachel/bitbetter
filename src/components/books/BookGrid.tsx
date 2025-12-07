@@ -59,7 +59,7 @@ export const BookGrid = ({ books, onSelect }: BookGridProps) => {
           <p className="text-lg font-medium">
             이 카테고리에 등록된 책이 없습니다.
           </p>
-          <p className="mt-2">다른 카테고리를 확인해보세요.</p>
+          <p className="mt-2">다른 카테고리를 확인해 보세요.</p>
         </div>
       )}
     </motion.div>
