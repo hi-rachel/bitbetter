@@ -18,7 +18,8 @@ A personal portfolio & productivity blog built with **Next.js**, **TypeScript**,
 
 - 📝 **Blog** – Structured tech articles
 - 📚 **Books** – Reading reviews & recommendations
-- 🔖 **Bookmark** – Curated external inspirations
+- 🎵 **Playlist** – Curated playlists for productivity
+- 💼 **Projects** – Portfolio of development projects
 - 📈 **1%** – Daily growth & GitHub commit analytics
 
 ---
