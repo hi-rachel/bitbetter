@@ -2,10 +2,12 @@
 export const FOLDER_NAME_MAPPING: Record<string, string> = {
   algorithms: "Algorithms",
   datastructures: "Data Structures",
+  database: "DataBase",
   python: "Python",
   javascript: "JavaScript",
   typescript: "TypeScript",
   react: "React",
+  styling: "Styling",
   cs: "Computer Science",
   network: "Network",
   http: "HTTP",
