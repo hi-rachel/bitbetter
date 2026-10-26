@@ -100,7 +100,6 @@ const PlaylistPage = () => {
                 >
                   {category === PLAYLIST_CATEGORIES.POP && "Pop Song"}
                   {category === PLAYLIST_CATEGORIES.LOFI && "Lofi"}
-                  {category === PLAYLIST_CATEGORIES.JAZZ && "Jazz"}
                   {category === PLAYLIST_CATEGORIES.MY_PLAYLIST &&
                     myPlaylistTitle}
                 </button>

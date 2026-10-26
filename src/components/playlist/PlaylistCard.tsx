@@ -13,7 +13,6 @@ const categoryColors = {
   [PLAYLIST_CATEGORIES.ALL]: "bg-gray-100 text-gray-800 border-gray-200",
   [PLAYLIST_CATEGORIES.POP]: "bg-pink-100 text-pink-800 border-pink-200",
   [PLAYLIST_CATEGORIES.LOFI]: "bg-blue-100 text-blue-800 border-blue-200",
-  [PLAYLIST_CATEGORIES.JAZZ]: "bg-purple-100 text-purple-800 border-purple-200",
   [PLAYLIST_CATEGORIES.MY_PLAYLIST]:
     "bg-green-100 text-green-800 border-green-200",
 };
@@ -22,7 +21,6 @@ const categoryIcons = {
   [PLAYLIST_CATEGORIES.ALL]: "🎵",
   [PLAYLIST_CATEGORIES.POP]: "🎵",
   [PLAYLIST_CATEGORIES.LOFI]: "🎧",
-  [PLAYLIST_CATEGORIES.JAZZ]: "🎷",
   [PLAYLIST_CATEGORIES.MY_PLAYLIST]: "⭐",
 };
 
@@ -68,7 +66,6 @@ export const PlaylistCard = ({ playlist, index }: PlaylistCardProps) => {
               <span className="pr-1">{categoryIcons[playlist.category]}</span>
               {playlist.category === PLAYLIST_CATEGORIES.POP && "Pop Song"}
               {playlist.category === PLAYLIST_CATEGORIES.LOFI && "Lofi"}
-              {playlist.category === PLAYLIST_CATEGORIES.JAZZ && "Jazz"}
               {playlist.category === PLAYLIST_CATEGORIES.MY_PLAYLIST &&
                 "My Playlist"}
             </span>
