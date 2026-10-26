@@ -5,7 +5,7 @@ export const projects: ProjectItem[] = [
     id: "hakote",
     name: "📬 하코테 (하루코딩테스트)",
     description: "매일 한 문제, 코딩 테스트 준비 알고리즘 메일링 서비스",
-    serviceUrl: "https://www.hakote.dev/",
+    serviceUrl: "https://hakote.vercel.app/",
     image:
       "https://github.com/user-attachments/assets/e002a532-fcc7-46c1-b5a3-57d56deef2e5",
     githubUrl: "https://github.com/Hakote/Hakote",
@@ -43,7 +43,7 @@ export const projects: ProjectItem[] = [
     id: "artina",
     name: "🖼️ Artina",
     description: "온라인 미술관 | AI Docent",
-    serviceUrl: "https://artina-museum.vercel.app/",
+    serviceUrl: "https://artina-gallery.vercel.app/",
     image:
       "https://github.com/user-attachments/assets/fccbfcb2-35ff-4a67-ad30-aa48e7e5d533",
     githubUrl: "https://github.com/hi-rachel/artina",
