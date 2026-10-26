@@ -106,7 +106,7 @@ export const projects: ProjectItem[] = [
     serviceUrl: "https://realtime-x-1f51f.web.app/",
     image:
       "https://github.com/user-attachments/assets/22d5c8ed-af9b-435d-8be1-5f30ab0dea0e",
-    githubUrl: "https://realtime-x-1f51f.web.app/",
+    githubUrl: "https://github.com/hi-rachel/dev-connect",
     startYear: 2024,
   },
   {
@@ -116,7 +116,7 @@ export const projects: ProjectItem[] = [
     serviceUrl: "https://lat-long.vercel.app/",
     image:
       "https://github.com/user-attachments/assets/bc1df7ef-b1cc-4c78-b25c-4f95bdb7d5de",
-    githubUrl: "https://lat-long.vercel.app/",
+    githubUrl: "https://github.com/hi-rachel/lat-long",
     startYear: 2024,
   },
   {
